@@ -13,7 +13,7 @@ let puntosBot = 0;
 
 let offsetPlayer = 0;
 let offsetBot = 0;
-
+let primeraEmpatada = false;
 let empiezaJugador = true;
 let turnoJugador = true;
 let trucoNivel = -1;
@@ -52,14 +52,12 @@ function calcularEnvido(mano) {
   return maxEnvido;
 }
 
-
 function crearMazo(){
   mazo = [];
   for(const p of palos) for(const n of numeros) {
     mazo.push({numero:n,palo:p,fuerza:fuerza[`${n}${p}`] || fuerza[n] || 0});
   }
 }
-
 
 function sacarCarta(){
   const i = Math.floor(Math.random()*mazo.length);
@@ -209,21 +207,32 @@ function resolveBaza() {
   if (fp > fb) ganador = "player", bazasJugador++;
   else if (fb > fp) ganador = "bot", bazasBot++;
   else ganador = "tie";
-
   playedPlayer = null;
   playedBot = null;
-
-  if ((bazasJugador + bazasBot === 1) && ganador === "tie") {
+  if (bazasJugador + bazasBot === 0 && ganador === "tie") {
+    primeraEmpatada = true;
     turnoJugador = !empiezaJugador;
+    return;
+  }
+  if (primeraEmpatada && (bazasJugador + bazasBot === 1)) {
+    finishHandByBazas();
+    primeraEmpatada = false;
     return;
   }
   if (bazasJugador === 2 || bazasBot === 2 || (bazasJugador + bazasBot === 3)) {
     finishHandByBazas();
+    primeraEmpatada = false;
     return;
   }
-  let siguiente = ganador === "player" ? "player" : ganador === "bot" ? "bot" : (empiezaJugador ? "player" : "bot");
+  let siguiente = ganador === "player"
+    ? "player"
+    : ganador === "bot"
+    ? "bot"
+    : empiezaJugador
+    ? "player"
+    : "bot";
   turnoJugador = siguiente === "player";
-  if(!turnoJugador) setTimeout(botPlayFirst, 600);
+  if (!turnoJugador) setTimeout(botPlayFirst, 600);
 }
 
 
@@ -295,9 +304,9 @@ function cantarEnvido(){
     log(`Bot quiere Envido. Vos: ${eJ} - Bot: ${eB}`);
     if(eJ > eB){ puntosJugador += 2; log("Ganaste el Envido (+2)"); }
     else if(eB > eJ){ puntosBot += 2; log("Bot gana el Envido (+2)"); }
-    else { 
-      if(empiezaJugador){ puntosJugador += 2; log("Empate en Envido: gana quien es mano (Vos) (+2)"); } 
-      else { puntosBot += 2; log("Empate en Envido: gana quien es mano (Bot) (+2)"); } 
+    else {
+      if(empiezaJugador){ puntosJugador += 2; log("Empate en Envido: gana quien es mano (Vos) (+2)"); }
+      else { puntosBot += 2; log("Empate en Envido: gana quien es mano (Bot) (+2)"); }
     }
   } else {
     log("Bot no quiere Envido");
@@ -322,9 +331,9 @@ function cantarRealEnvido(){
     log(`Bot quiere Real Envido. Vos: ${eJ} - Bot: ${eB}`);
     if(eJ > eB){ puntosJugador += 3; log("Ganaste Real Envido (+3)"); }
     else if(eB > eJ){ puntosBot += 3; log("Bot gana Real Envido (+3)"); }
-    else { 
-      if(empiezaJugador){ puntosJugador += 3; log("Empate en Real Envido: gana quien es mano (Vos) (+3)"); } 
-      else { puntosBot += 3; log("Empate en Real Envido: gana quien es mano (Bot) (+3)"); } 
+    else {
+      if(empiezaJugador){ puntosJugador += 3; log("Empate en Real Envido: gana quien es mano (Vos) (+3)"); }
+      else { puntosBot += 3; log("Empate en Real Envido: gana quien es mano (Bot) (+3)"); }
     }
   } else {
     log("Bot no quiere Real Envido");
@@ -350,9 +359,9 @@ function cantarFaltaEnvido(){
     log(`Bot quiere Falta Envido. Vos: ${eJ} - Bot: ${eB}`);
     if(eJ > eB){ puntosJugador += falta; log(`Ganaste Falta Envido (+${falta})`); }
     else if(eB > eJ){ puntosBot += falta; log(`Bot gana Falta Envido (+${falta})`); }
-    else { 
-      if(empiezaJugador){ puntosJugador += falta; log(`Empate Falta Envido: gana quien es mano (Vos) (+${falta})`); } 
-      else { puntosBot += falta; log(`Empate Falta Envido: gana quien es mano (Bot) (+${falta})`); } 
+    else {
+      if(empiezaJugador){ puntosJugador += falta; log(`Empate Falta Envido: gana quien es mano (Vos) (+${falta})`); }
+      else { puntosBot += falta; log(`Empate Falta Envido: gana quien es mano (Bot) (+${falta})`); }
     }
   } else {
     log("Bot no quiere Falta Envido");
@@ -486,7 +495,7 @@ function mostrarCartasEnMesa(origen, carta){
 function limpiarMesa(){
   const mesaCenter = document.getElementById("mesa-center");
   if(mesaCenter) mesaCenter.innerHTML = "";
-  offsetPlayer = 0;
+    offsetPlayer = 0;
   offsetBot = 0;
 }
 
