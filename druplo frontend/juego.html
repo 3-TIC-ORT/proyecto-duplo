@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=1366, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Truco con Bot</title>
   <link rel="stylesheet" href="juego.css" />
 </head>
@@ -42,6 +42,8 @@
         <button id="btnRealEnvido" onclick="cantarRealEnvido()">Real Envido</button>
         <button id="btnFaltaEnvido" onclick="cantarFaltaEnvido()">Falta Envido</button>
         <button id="btnMazo" onclick="irseAlMazo()">Irse al mazo</button>
+        <button id="btnQuiero" onclick="responderEnvido(true)" style="display:none">Quiero</button>
+        <button id="btnNoQuiero" onclick="responderEnvido(false)" style="display:none">No Quiero</button>
       </div>
     </div>
 
