@@ -19,6 +19,8 @@ let turnoJugador = true;
 let trucoNivel = -1;
 
 let envidoCantado = false;
+let envidoNivel = 0;
+let envidoEnCurso = false;
 let esperandoRespuestaEnvido = false;
 let tipoEnvidoActual = "envido";
 
@@ -418,40 +420,81 @@ function ocultarBotonesEnvido(){
 
 function responderEnvido(respuesta) {
   ocultarBotonesEnvido();
+
+  // Si elegís subir el Envido (respuesta = "envido" / "real" / "falta")
+  if (typeof respuesta === "string") {
+    let tipoNuevo = respuesta;
+    const niveles = { envido: 1, real: 2, falta: 3 };
+    const nivelNuevo = niveles[tipoNuevo];
+    const nivelActual = niveles[tipoEnvidoActual];
+
+    if (nivelNuevo <= nivelActual) {
+      log("No podés cantar eso ahora.");
+      return;
+    }
+
+    tipoEnvidoActual = tipoNuevo;
+    log(`🔥 Le subís con ${tipoNuevo === "falta" ? "FALTA ENVIDO" : tipoNuevo.toUpperCase()}!`);
+
+    // Bot decide si acepta o no
+    const eB = calcularEnvido(manoBot);
+    const aceptar =
+      (nivelNuevo === 1 && (eB >= 25 || Math.random() < 0.7)) ||
+      (nivelNuevo === 2 && (eB >= 28 || Math.random() < 0.5)) ||
+      (nivelNuevo === 3 && (eB >= 30 || Math.random() < 0.3));
+
+    if (aceptar) {
+      log(`🤖 Bot acepta el ${tipoNuevo.toUpperCase()}!`);
+      setTimeout(() => resolverEnvido(), 500);
+    } else {
+      log(`🤖 Bot no quiere el ${tipoNuevo.toUpperCase()}.`);
+      puntosJugador += 1;
+      actualizarPuntos();
+      esperarYSeguir();
+    }
+    return;
+  }
+
+  // Si simplemente respondés "quiero" o "no quiero"
   esperandoRespuestaEnvido = false;
 
+  if (respuesta === true) resolverEnvido();
+  else {
+    puntosBot += 1;
+    log(`No quisiste ${tipoEnvidoActual}. Bot gana 1 punto.`);
+    actualizarPuntos();
+    esperarYSeguir();
+  }
+}
+
+function resolverEnvido() {
   const eJ = calcularEnvido(manoJugador);
   const eB = calcularEnvido(manoBot);
 
-  let puntos = tipoEnvidoActual === "envido" ? 2 :
-  tipoEnvidoActual === "real" ? 3 : 15;
+  let puntos =
+    tipoEnvidoActual === "envido" ? 2 :
+    tipoEnvidoActual === "real" ? 3 :
+    15 - Math.max(puntosJugador, puntosBot); // Falta Envido
 
-  if (respuesta === true) {
-    if (eJ > eB) {
-      puntosJugador += puntos;
-      log(`Ganaste ${tipoEnvidoActual} (+${puntos})`);
-    } else if (eB > eJ) {
-      puntosBot += puntos;
-      log(`Bot gana ${tipoEnvidoActual} (+${puntos})`);
-    } else {
-      if (empiezaJugador) {
-        puntosJugador += puntos;
-        log(`Empate ${tipoEnvidoActual}: gana quien es mano (Vos) (+${puntos})`);
-      } else {
-        puntosBot += puntos;
-        log(`Empate ${tipoEnvidoActual}: gana quien es mano (Bot) (+${puntos})`);
-      }
-    }
-    log(`Puntaje Envido: Vos ${eJ} - Bot ${eB}`);
+  if (eJ > eB) {
+    puntosJugador += puntos;
+    log(`Ganaste ${tipoEnvidoActual} (+${puntos})`);
+  } else if (eB > eJ) {
+    puntosBot += puntos;
+    log(`Bot gana ${tipoEnvidoActual} (+${puntos})`);
   } else {
-    puntosBot += 1;
-    log(`No quisiste ${tipoEnvidoActual}. Bot gana 1 punto.`);
+    if (empiezaJugador) {
+      puntosJugador += puntos;
+      log(`Empate ${tipoEnvidoActual}: gana quien es mano (Vos) (+${puntos})`);
+    } else {
+      puntosBot += puntos;
+      log(`Empate ${tipoEnvidoActual}: gana quien es mano (Bot) (+${puntos})`);
+    }
   }
 
+  log(`Puntaje Envido: Vos ${eJ} - Bot ${eB}`);
   actualizarPuntos();
-  if (!turnoJugador && manoBot.length > 0) {
-    setTimeout(botPlayFirst, 400);
-  }
+  esperarYSeguir();
 }
 
 
@@ -497,6 +540,12 @@ function limpiarMesa(){
   if(mesaCenter) mesaCenter.innerHTML = "";
     offsetPlayer = 0;
   offsetBot = 0;
+}
+
+function esperarYSeguir() {
+  if (!turnoJugador && manoBot.length > 0) {
+    setTimeout(botPlayFirst, 700);
+  }
 }
 
 
