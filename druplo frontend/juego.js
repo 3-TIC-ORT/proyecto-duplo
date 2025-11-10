@@ -20,6 +20,7 @@ let trucoNivel = -1;
 
 let envidoCantado = false;
 let envidoNivel = 0;
+
 let envidoEnCurso = false;
 let esperandoRespuestaEnvido = false;
 let tipoEnvidoActual = "envido";
@@ -306,121 +307,63 @@ function cantarTruco(){
 }
 
 
-function cantarEnvido(){
-  if (envidoCantado || manoJugador.length < 3) return log("No se puede cantar Envido después de la primera carta.");
-  envidoCantado = true;
-  safeDisable("btnEnvido", true);
-  safeDisable("btnRealEnvido", true);
-  safeDisable("btnFaltaEnvido", true);
-
-  const eJ = calcularEnvido(manoJugador);
-  const eB = calcularEnvido(manoBot);
-  const quiere = eB >= 26 ? true : (eB <= 19 ? false : Math.random() < 0.6);
-
-  if(quiere){
-    log(`Bot quiere Envido. Vos: ${eJ} - Bot: ${eB}`);
-    if(eJ > eB){ puntosJugador += 2; log("Ganaste el Envido (+2)"); }
-    else if(eB > eJ){ puntosBot += 2; log("Bot gana el Envido (+2)"); }
-    else {
-      if(empiezaJugador){ puntosJugador += 2; log("Empate en Envido: gana quien es mano (Vos) (+2)"); }
-      else { puntosBot += 2; log("Empate en Envido: gana quien es mano (Bot) (+2)"); }
-    }
-  } else {
-    log("Bot no quiere Envido");
-    puntosJugador += 1;
-  }
-  actualizarPuntos();
+function cantarEnvido() {
+  if (!esperandoRespuestaEnvido) return;
+  envidoAcumulado += 2;
+  ultimoAporte = 2;
+  tipoEnvidoActual = "envido";
+  log("Le subís: Envido");
+  mostrarBotonesEnvido();
 }
 
-
-function cantarRealEnvido(){
-  if (envidoCantado || manoJugador.length < 3) return log("No se puede cantar Real Envido después de la primera carta.");
-  envidoCantado = true;
-  safeDisable("btnEnvido", true);
-  safeDisable("btnRealEnvido", true);
-  safeDisable("btnFaltaEnvido", true);
-
-  const eJ = calcularEnvido(manoJugador);
-  const eB = calcularEnvido(manoBot);
-  const quiere = eB >= 27 ? true : (eB <= 20 ? false : Math.random() < 0.6);
-
-  if(quiere){
-    log(`Bot quiere Real Envido. Vos: ${eJ} - Bot: ${eB}`);
-    if(eJ > eB){ puntosJugador += 3; log("Ganaste Real Envido (+3)"); }
-    else if(eB > eJ){ puntosBot += 3; log("Bot gana Real Envido (+3)"); }
-    else {
-      if(empiezaJugador){ puntosJugador += 3; log("Empate en Real Envido: gana quien es mano (Vos) (+3)"); }
-      else { puntosBot += 3; log("Empate en Real Envido: gana quien es mano (Bot) (+3)"); }
-    }
-  } else {
-    log("Bot no quiere Real Envido");
-    puntosJugador += 1;
-  }
-  actualizarPuntos();
+function cantarRealEnvido() {
+  if (!esperandoRespuestaEnvido) return;
+  envidoAcumulado += 3;
+  ultimoAporte = 3;
+  tipoEnvidoActual = "real";
+  log("Le subís: Real Envido");
+  mostrarBotonesEnvido();
 }
 
+function cantarFaltaEnvido() {
+  if (!esperandoRespuestaEnvido) return;
 
-function cantarFaltaEnvido(){
-  if (envidoCantado || manoJugador.length < 3) return log("No se puede cantar Falta Envido después de la primera carta.");
-  envidoCantado = true;
-  safeDisable("btnEnvido", true);
-  safeDisable("btnRealEnvido", true);
-  safeDisable("btnFaltaEnvido", true);
-
-  const eJ = calcularEnvido(manoJugador);
-  const eB = calcularEnvido(manoBot);
   const falta = 15 - Math.max(puntosJugador, puntosBot);
-  const quiere = eB >= 28 ? true : Math.random() < 0.5;
-
-  if(quiere){
-    log(`Bot quiere Falta Envido. Vos: ${eJ} - Bot: ${eB}`);
-    if(eJ > eB){ puntosJugador += falta; log(`Ganaste Falta Envido (+${falta})`); }
-    else if(eB > eJ){ puntosBot += falta; log(`Bot gana Falta Envido (+${falta})`); }
-    else {
-      if(empiezaJugador){ puntosJugador += falta; log(`Empate Falta Envido: gana quien es mano (Vos) (+${falta})`); }
-      else { puntosBot += falta; log(`Empate Falta Envido: gana quien es mano (Bot) (+${falta})`); }
-    }
-  } else {
-    log("Bot no quiere Falta Envido");
-    puntosJugador += 1;
-  }
-  actualizarPuntos();
+  envidoAcumulado += falta;
+  ultimoAporte = falta;
+  tipoEnvidoActual = "falta";
+  log("Le subís: Falta Envido");
+  mostrarBotonesEnvido();
 }
 
 
 function botCantaEnvidoTipo() {
   if (manoBot.length < 3) return;
-  if (envidoCantado) return;
 
   const eB = calcularEnvido(manoBot);
-  let tipo = "envido";
-  if (eB >= 29 && Math.random() < 0.5) tipo = "real";
-  if (eB >= 32 && Math.random() < 0.7) tipo = "falta";
-
   envidoCantado = true;
   esperandoRespuestaEnvido = true;
-  tipoEnvidoActual = tipo;
 
-  log(`Bot canta ${tipo === "envido" ? "Envido" : tipo === "real" ? "Real Envido" : "Falta Envido"}`);
-  mostrarBotonesEnvido(tipo);
+  envidoAcumulado = 2;   // envido siempre arranca valiendo 2
+  ultimoAporte = 2;
+  tipoEnvidoActual = "envido";
+
+  log("Bot canta Envido");
+  mostrarBotonesEnvido();
 }
 
 
-function mostrarBotonesEnvido(tipo){
+function mostrarBotonesEnvido() {
   document.getElementById("btnQuiero").style.display = "inline-block";
   document.getElementById("btnNoQuiero").style.display = "inline-block";
+
   safeDisable("btnTruco", true);
-  if(tipo === "envido"){
-    safeDisable("btnEnvido", false);
-    safeDisable("btnRealEnvido", false);
-    safeDisable("btnFaltaEnvido", false);
-  } else if(tipo === "real"){
-    safeDisable("btnRealEnvido", false);
-    safeDisable("btnFaltaEnvido", false);
-  } else if(tipo === "falta"){
-    safeDisable("btnFaltaEnvido", false);
-  }
+  safeDisable("btnEnvido", false);
+  safeDisable("btnRealEnvido", false);
+  safeDisable("btnFaltaEnvido", false);
+  safeDisable("btnMazo", true);
 }
+
 
 function ocultarBotonesEnvido(){
   document.getElementById("btnQuiero").style.display = "none";
@@ -433,39 +376,40 @@ function ocultarBotonesEnvido(){
 }
 
 
-function responderEnvido(respuesta) {
+function responderEnvido(quiere) {
   ocultarBotonesEnvido();
   esperandoRespuestaEnvido = false;
 
   const eJ = calcularEnvido(manoJugador);
   const eB = calcularEnvido(manoBot);
 
-  let puntos = tipoEnvidoActual === "envido" ? 2 :
-  tipoEnvidoActual === "real" ? 3 : 15;
+  if (!quiere) {
+    // Bot NO quiere -> solo te llevás los puntos anteriores (antes de la subida)
+    puntosJugador += (envidoAcumulado - ultimoAporte);
+    log(`Bot no quiere. Ganás ${envidoAcumulado - ultimoAporte} puntos.`);
+  } else {
+    log("Bot quiere");
 
-  if (respuesta === true) {
     if (eJ > eB) {
-      puntosJugador += puntos;
-      log(`Ganaste ${tipoEnvidoActual} (+${puntos})`);
+      puntosJugador += envidoAcumulado;
+      log(`Ganaste el Envido (+${envidoAcumulado})`);
     } else if (eB > eJ) {
-      puntosBot += puntos;
-      log(`Bot gana ${tipoEnvidoActual} (+${puntos})`);
+      puntosBot += envidoAcumulado;
+      log(`Bot gana el Envido (+${envidoAcumulado})`);
     } else {
       if (empiezaJugador) {
-        puntosJugador += puntos;
-        log(`Empate ${tipoEnvidoActual}: gana quien es mano (Vos) (+${puntos})`);
+        puntosJugador += envidoAcumulado;
+        log(`Empate: sos mano, ganás (+${envidoAcumulado})`);
       } else {
-        puntosBot += puntos;
-        log(`Empate ${tipoEnvidoActual}: gana quien es mano (Bot) (+${puntos})`);
+        puntosBot += envidoAcumulado;
+        log(`Empate: Bot es mano, gana (+${envidoAcumulado})`);
       }
     }
     log(`Puntaje Envido: Vos ${eJ} - Bot ${eB}`);
-  } else {
-    puntosBot += 1;
-    log(`No quisiste ${tipoEnvidoActual}. Bot gana 1 punto.`);
   }
 
   actualizarPuntos();
+
   if (!turnoJugador && manoBot.length > 0) {
     setTimeout(botPlayFirst, 400);
   }
