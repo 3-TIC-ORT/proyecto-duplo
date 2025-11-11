@@ -79,11 +79,8 @@ function repartir(){
   empiezaJugador = !empiezaJugador;
   turnoJugador = empiezaJugador;
   trucoNivel = -1;
-  envidoCantado = false;
-  envidoYaJugado = false;
+  resetEnvido();
   rondaTerminada = false;
-  esperandoRespuestaEnvido = false;
-  tipoEnvidoActual = "envido";
   playedPlayer = null;
   playedBot = null;
   bazasJugador = 0;
@@ -335,7 +332,6 @@ function cantarEnvido() {
   decidirSiBotQuiere(tipoEnvidoActual);
 }
 
-
 function cantarRealEnvido() {
   if (!esperandoRespuestaEnvido || !envidoCantado) {
     log("No podés cantar Real Envido ahora.");
@@ -352,7 +348,6 @@ function cantarRealEnvido() {
   decidirSiBotQuiere(tipoEnvidoActual);
 }
 
-
 function cantarFaltaEnvido() {
   if (!esperandoRespuestaEnvido || !envidoCantado) {
     log("No podés cantar Falta Envido ahora.");
@@ -364,6 +359,7 @@ function cantarFaltaEnvido() {
   log("Cantas Falta Envido");
 
   const falta = 15 - Math.max(puntosJugador, puntosBot);
+
   envidoAcumulado += falta;
   ultimoAporte = falta;
 
@@ -372,17 +368,16 @@ function cantarFaltaEnvido() {
 
 
 function decidirSiBotQuiere(tipo) {
-  if (botYaRespondioEnvido) return; // 👈 evita doble "Bot quiere"
+  if (botYaRespondioEnvido) return;
 
   botYaRespondioEnvido = true;
   esperandoRespuestaEnvido = true;
 
   setTimeout(() => {
-    const quiere = Math.random() < 0.6; // la lógica que ya tenías para querer/no querer
+    const quiere = Math.random() < 0.6;
     responderEnvido(quiere);
   }, 600);
 }
-
 
 
 function botCantaEnvidoTipo() {
@@ -432,10 +427,9 @@ function responderEnvido(quiere) {
   const eB = calcularEnvido(manoBot);
 
   if (!quiere) {
-    puntosJugador += (envidoAcumulado - ultimoAporte);
-    log(`Bot no quiere. Ganás ${envidoAcumulado - ultimoAporte} puntos.`);
+    puntosJugador += 1;
+    log(`Bot no quiere. Ganás 1 punto.`);
   } else {
-    log("Bot quiere");
   
     if (eJ > eB) {
       puntosJugador += envidoAcumulado;
@@ -464,6 +458,20 @@ function responderEnvido(quiere) {
   if (!turnoJugador && manoBot.length > 0) {
     setTimeout(botPlayFirst, 400);
   }
+}
+
+
+function resetEnvido() {
+  envidoCantado = false;
+  envidoNivel = 0;
+  subiendoEnvido = false;
+  envidoAcumulado = 0;
+  ultimoAporte = 0;
+  botYaRespondioEnvido = false;
+  envidoYaJugado = false;
+  envidoEnCurso = false;
+  esperandoRespuestaEnvido = false;
+  tipoEnvidoActual = "envido";
 }
 
 
