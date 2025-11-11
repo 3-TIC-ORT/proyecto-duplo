@@ -20,6 +20,7 @@ let trucoNivel = -1;
 
 let envidoCantado = false;
 let envidoNivel = 0;
+let subiendoEnvido = false;
 
 let envidoEnCurso = false;
 let esperandoRespuestaEnvido = false;
@@ -309,31 +310,72 @@ function cantarTruco(){
 
 function cantarEnvido() {
   if (!esperandoRespuestaEnvido) return;
+  if (subiendoEnvido) return;
+
+  subiendoEnvido = true;
+  log("Le subís: Envido");
+
   envidoAcumulado += 2;
   ultimoAporte = 2;
   tipoEnvidoActual = "envido";
-  log("Le subís: Envido");
-  mostrarBotonesEnvido();
+
+  decidirSiBotQuiere();
 }
 
 function cantarRealEnvido() {
   if (!esperandoRespuestaEnvido) return;
+  if (subiendoEnvido) return;
+
+  subiendoEnvido = true;
+  log("Le subís: Real Envido");
+
   envidoAcumulado += 3;
   ultimoAporte = 3;
-  tipoEnvidoActual = "real";
-  log("Le subís: Real Envido");
-  mostrarBotonesEnvido();
+  tipoEnvidoActual = "real envido";
+
+  decidirSiBotQuiere();
 }
 
 function cantarFaltaEnvido() {
   if (!esperandoRespuestaEnvido) return;
+  if (subiendoEnvido) return;
+
+  subiendoEnvido = true;
+  log("Le subís: Falta Envido");
 
   const falta = 15 - Math.max(puntosJugador, puntosBot);
   envidoAcumulado += falta;
   ultimoAporte = falta;
-  tipoEnvidoActual = "falta";
-  log("Le subís: Falta Envido");
-  mostrarBotonesEnvido();
+  tipoEnvidoActual = "falta envido";
+
+  decidirSiBotQuiere();
+}
+
+function decidirSiBotQuiere() {
+
+  ocultarBotonesEnvido();
+  esperandoRespuestaEnvido = false;
+
+  const eB = calcularEnvido(manoBot);
+  let acepta = false;
+
+  if (tipoEnvidoActual === "envido") {
+    acepta = eB >= 26;
+  } else if (tipoEnvidoActual === "real envido") {
+    acepta = eB >= 29;
+  } else if (tipoEnvidoActual === "falta envido") {
+    acepta = eB >= 30;
+  }
+
+  if (acepta) {
+    log("Bot quiere");
+    responderEnvido(true);
+  } else {
+    log("Bot no quiere");
+    responderEnvido(false);
+  }
+
+  subiendoEnvido = false;
 }
 
 
@@ -344,7 +386,7 @@ function botCantaEnvidoTipo() {
   envidoCantado = true;
   esperandoRespuestaEnvido = true;
 
-  envidoAcumulado = 2;   // envido siempre arranca valiendo 2
+  envidoAcumulado = 2;
   ultimoAporte = 2;
   tipoEnvidoActual = "envido";
 
@@ -384,7 +426,6 @@ function responderEnvido(quiere) {
   const eB = calcularEnvido(manoBot);
 
   if (!quiere) {
-    // Bot NO quiere -> solo te llevás los puntos anteriores (antes de la subida)
     puntosJugador += (envidoAcumulado - ultimoAporte);
     log(`Bot no quiere. Ganás ${envidoAcumulado - ultimoAporte} puntos.`);
   } else {
