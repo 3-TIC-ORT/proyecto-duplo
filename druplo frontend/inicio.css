@@ -70,21 +70,30 @@ h3 {
 #overlay2 {
     display: none;
     position: absolute;
-    top: 1px;
-    left: 1px;
+    top: 0px;
+    left: 0px;
     width: 100%;
     height: 100%;
-    background-color:solid rgba(0, 0, 0, 0.85);
+    background-color:rgba(0, 0, 0, 0.85);
     z-index: 1000;
 }
 
 
-#modal {
+#modalConfiguracion {
     position: center;
     width: 100%;
     background-color: #ffff00;
     padding: 2em;
     border-radius: 100px;
+    color: #0000ff;
+    z-index: 1001;
+    
+}
+#modalColeccion{
+    position: center;
+    width: 100%;
+    background-color: #ffff00;
+    padding: 2em;
     color: #0000ff;
     z-index: 1001;
     
@@ -164,3 +173,53 @@ h3 {
     background-color: rgb(126, 0, 0);
     box-shadow: 0px 0px 2rem black;
 }
+
+.cards {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: center;
+  }
+  
+  .carta {
+    position: relative;
+    border-radius: 10px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+  }
+  
+  .carta:hover {
+    transform: scale(1.05);
+  }
+  
+  .carta img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 10px;
+  }
+  
+  /* --- Capa gris encima de las cartas bloqueadas --- */
+  .carta.bloqueada::after {
+    content: "🔒";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(100, 100, 100, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    color: white;
+    border-radius: 10px;
+    transition: opacity 0.3s ease;
+  }
+  
+  .carta:not(.bloqueada)::after {
+    opacity: 0;
+    pointer-events: none;
+  }
+  
