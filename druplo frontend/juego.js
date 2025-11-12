@@ -20,6 +20,7 @@ let trucoNivel = -1;
 
 let envidoCantado = false;
 let envidoNivel = 0;
+let quienCantoEnvido = null;
 let subiendoEnvido = false;
 let envidoAcumulado = 0;
 let ultimoAporte = 0;
@@ -265,7 +266,7 @@ function finishHandByBazas(){
   if(trucoNivel === 0) pts = 1;
   else if(trucoNivel === 1) pts = 2;
   else if(trucoNivel === 2) pts = 3;
-
+  else if (trucoNivel === 3) pts = 4;
 
   if(bazasJugador > bazasBot){
     puntosJugador += pts;
@@ -294,31 +295,60 @@ function irseAlMazo() {
 }
 
 
-function cantarTruco(){
-  if(trucoNivel >= 0 || rondaTerminada) return log("Truco ya cantado");
+function cantarTruco() {
+  if (rondaTerminada || trucoNivel >= 1) return log("Ya está cantado el Truco o superior.");
+
   trucoNivel = 1;
-  log("Cantas Truco");
+  log("Cantas TRUCO");
+
   safeDisable("btnTruco", true);
-  const sum = manoBot.reduce((s,c)=>s+c.fuerza,0);
-  const quiere = sum >= 24 ? Math.random() < 0.95 : Math.random() < 0.6;
-  if(quiere) log("Bot quiere Truco");
-  else {
-    log("Bot no quiere Truco");
-    puntosJugador += 1;
-    actualizarPuntos();
-    rondaTerminada = true;
-    setTimeout(repartir,1000);
-  }
+  safeDisable("btnEnvido", true);
+  safeDisable("btnRealEnvido", true);
+  safeDisable("btnFaltaEnvido", true);
+
+  decidirRespuestaTruco(2, 1); // 2 si quiere, 1 si no quiere
 }
 
-function cantarRetruco(){
+function cantarRetruco() {
+  if (rondaTerminada || trucoNivel !== 1) return log("No podés cantar Retruco ahora.");
 
+  trucoNivel = 2;
+  log("Cantas RETRUCO");
 
+  decidirRespuestaTruco(3, 2); // 3 si quiere, 2 si no quiere
 }
 
-function cantarValecuatro(){
 
+function cantarValecuatro() {
+  if (rondaTerminada || trucoNivel !== 2) return log("No podés cantar Vale Cuatro ahora.");
 
+  trucoNivel = 3;
+  log("Cantas VALE CUATRO");
+
+  decidirRespuestaTruco(4, 3); // 4 si quiere, 3 si no quiere
+}
+
+function decidirRespuestaTruco(puntosSiQuiere, puntosSiNoQuiere) {
+  // el bot evalúa su mano según fuerza
+  const fuerzaBot = manoBot.reduce((acc, c) => acc + c.fuerza, 0);
+
+  let quiere = false;
+
+  if (fuerzaBot >= 28) quiere = true;          // mano fuerte
+  else if (fuerzaBot >= 22) quiere = Math.random() < 0.7;
+  else quiere = Math.random() < 0.4;           // mano floja
+
+  setTimeout(() => {
+    if (quiere) {
+      log(`Bot quiere ${trucoNivel === 1 ? "Truco" : trucoNivel === 2 ? "Retruco" : "Vale Cuatro"}`);
+    } else {
+      log(`Bot no quiere`);
+      puntosJugador += puntosSiNoQuiere;
+      actualizarPuntos();
+      rondaTerminada = true;
+      setTimeout(repartir, 1000);
+    }
+  }, 500);
 }
 
 
@@ -337,6 +367,7 @@ function cantarEnvido() {
   envidoCantado = true;
   tipoEnvidoActual = "envido";
   log("Cantas Envido");
+  quienCantoEnvido = "jugador";
 
   envidoAcumulado += 2;
   ultimoAporte = 2;
@@ -353,6 +384,7 @@ function cantarRealEnvido() {
   subiendoEnvido = true;
   tipoEnvidoActual = "real envido";
   log("Cantas Real Envido");
+  quienCantoEnvido = "jugador";
 
   envidoAcumulado += 3;
   ultimoAporte = 3;
@@ -369,6 +401,7 @@ function cantarFaltaEnvido() {
   subiendoEnvido = true;
   tipoEnvidoActual = "falta envido";
   log("Cantas Falta Envido");
+  quienCantoEnvido = "jugador";
 
   const falta = 15 - Math.max(puntosJugador, puntosBot);
 
@@ -402,6 +435,7 @@ function botCantaEnvidoTipo() {
   envidoAcumulado = 2;
   ultimoAporte = 2;
   tipoEnvidoActual = "envido";
+  quienCantoEnvido = "bot";
 
   log("Bot canta Envido");
   mostrarBotonesEnvido();
@@ -439,10 +473,20 @@ function responderEnvido(quiere) {
   const eB = calcularEnvido(manoBot);
 
   if (!quiere) {
-    puntosJugador += 1;
-    log(`Bot no quiere. Ganás 1 punto.`);
-  } else {
+    if (quienCantoEnvido === "jugador") {
+      puntosJugador += 1;
+      log(`Bot no quiere. Ganás 1 punto.`);
+    } else {
+      puntosBot += 1;
+      log(`No querés. Bot gana 1 punto.`);
+    }
   
+    actualizarPuntos();
+    botYaRespondioEnvido = false;
+    subiendoEnvido = false;
+    return;
+  }
+  {
     if (eJ > eB) {
       puntosJugador += envidoAcumulado;
       log(`Ganaste el Envido (+${envidoAcumulado})`);
