@@ -309,6 +309,7 @@ function cantarTruco() {
   decidirRespuestaTruco(2, 1); // 2 si quiere, 1 si no quiere
 }
 
+
 function cantarRetruco() {
   if (rondaTerminada || trucoNivel !== 1) return log("No podés cantar Retruco ahora.");
 
@@ -327,6 +328,7 @@ function cantarValecuatro() {
 
   decidirRespuestaTruco(4, 3); // 4 si quiere, 3 si no quiere
 }
+
 
 function decidirRespuestaTruco(puntosSiQuiere, puntosSiNoQuiere) {
   // el bot evalúa su mano según fuerza
