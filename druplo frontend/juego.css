@@ -120,7 +120,7 @@ body {
   margin-top: 170px;
 }
 .botonera button {
-  background: #0b7bff;
+  background: #ff0b0b;
   color: white;
   border: none;
   padding: 10px 16px;
@@ -178,7 +178,7 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
 }
 
 
-/* 🔹 Estilo general de las cartas */
+
 .carta-mesa {
   position: absolute;
   width: 90px;
@@ -191,7 +191,7 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
   transition: transform 0.3s ease, top 0.3s ease, left 0.3s ease;
 }
 
-/* 🔹 Cartas del jugador (lado derecho con leve desfase hacia la derecha y abajo) */
+
 .carta-jugador {
   right: 45%;
   top: 15%;

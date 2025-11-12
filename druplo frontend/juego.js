@@ -87,6 +87,8 @@ function repartir(){
   bazasBot = 0;
 
   safeDisable("btnTruco", false);
+  safeDisable("btnRetruco",false);
+  safeDisable("btnValecuatro",false);
   safeDisable("btnEnvido", false);
   safeDisable("btnRealEnvido", false);
   safeDisable("btnFaltaEnvido", false);
@@ -307,6 +309,16 @@ function cantarTruco(){
     rondaTerminada = true;
     setTimeout(repartir,1000);
   }
+}
+
+function cantarRetruco(){
+
+
+}
+
+function cantarValecuatro(){
+
+
 }
 
 
