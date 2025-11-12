@@ -311,12 +311,12 @@ function cantarTruco(){
   }
 }
 
-function cantarRetruco(){
+function cantarRetruco() {
 
 
 }
 
-function cantarValecuatro(){
+function cantarValecuatro() {
 
 
 }
