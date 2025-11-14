@@ -195,28 +195,6 @@ function chooseBotCardWhenStarting() {
 }
 
 
-function botIntentarCantarTruco() {
-  if (trucoNivel >= 0 || rondaTerminada) return false;
-
-  const fuerzaBot = manoBot.reduce((acc, c) => acc + c.fuerza, 0);
-
-  if (fuerzaBot >= 28) {
-    trucoNivel = 0;
-    log("Bot canta TRUCO");
-
-    safeDisable("btnTruco", true);
-    safeDisable("btnEnvido", true);
-    safeDisable("btnRealEnvido", true);
-    safeDisable("btnFaltaEnvido", true);
-
-    decidirRespuestaTruco(2, 1);
-    return true;   // canta truco
-  }
-
-  return false;    // NO canta truco → EL BOT DEBE SEGUIR JUGANDO CARTA
-}
-
-
 function botRespondToPlayer(cartaJugador) {
   if (!esperandoRespuestaEnvido && !playedBot && botIntentarCantarTruco()) {
     return;}
@@ -274,13 +252,16 @@ function resolveBaza() {
     primeraEmpatada = false;
     return;
   }
-  let siguiente = ganador === "player"
-    ? "player"
-    : ganador === "bot"
-    ? "bot"
-    : empiezaJugador
-    ? "player"
-    : "bot";
+  let siguiente;
+
+if (ganador === "player") {
+  siguiente = "player";
+} else if (ganador === "bot") {
+  siguiente = "bot";
+} else {
+siguiente = empiezaJugador ? "player" : "bot";
+}
+
   turnoJugador = siguiente === "player";
   if (!turnoJugador) setTimeout(botPlayFirst, 600);
 }
@@ -319,6 +300,56 @@ function irseAlMazo() {
   log(`Te fuiste al mazo. Bot gana ${puntos} punto${puntos>1?"s":""}.`);
   setTimeout(repartir,600);
 }
+
+
+ function botIntentarCantarTruco() {
+  if (trucoNivel >= 0 || rondaTerminada) return false;
+
+  const fuerzaBot = manoBot.reduce((acc, c) => acc + c.fuerza, 0);
+
+  if (fuerzaBot >= 28) {
+    trucoNivel = 0;
+    log("Bot canta TRUCO");
+
+safeDisable("btnTruco", true);
+safeDisable("btnEnvido", true);
+safeDisable("btnRealEnvido", true);
+safeDisable("btnFaltaEnvido", true);
+
+btnQuiero.style.display = "inline-block";
+btnNoQuiero.style.display = "inline-block";
+
+btnQuiero.onclick = () => responderTruco(true);
+btnNoQuiero.onclick = () => responderTruco(false);
+
+return true;
+  }
+  return false;
+}
+
+
+function responderTruco(quiero) {
+    btnQuiero.style.display = "none";
+    btnNoQuiero.style.display = "none";
+
+    if (quiero) {
+        log("quisiste el truco");
+        trucoNivel = 1;
+
+        if (!turnoJugador && !playedBot && !rondaTerminada) {
+            setTimeout(() => {
+                if (!playedBot) botPlayFirst();
+            }, 400);
+        }
+
+    } else {
+        log("No querido. Ganás 1 punto.");
+        puntosJugador += 1;
+        actualizarPuntos();
+        resetRonda();
+    }
+}
+
 
 
 function cantarTruco() {
@@ -369,7 +400,7 @@ function decidirRespuestaTruco(puntosSiQuiere, puntosSiNoQuiere) {
     if (quiere) {
       log(`Bot quiere ${trucoNivel === 1 ? "Truco" : trucoNivel === 2 ? "Retruco" : "Vale Cuatro"}`);
     } else {
-      log(`Bot no quiere`);
+      log(`Bot no quiere ganas 1 punto`);
       puntosJugador += puntosSiNoQuiere;
       actualizarPuntos();
       rondaTerminada = true;
@@ -381,10 +412,9 @@ function decidirRespuestaTruco(puntosSiQuiere, puntosSiNoQuiere) {
 
 function cantarEnvido() {
   if (envidoCantado && !esperandoRespuestaEnvido) {
-    log("Ya cantaron Envido en esta mano.");
+     safeDisable("btnEnvido", true);
     return;
   }
-
   if (!esperandoRespuestaEnvido && (manoJugador.length < 3 || manoBot.length < 3)) {
     log("Sólo podés cantar Envido antes de jugar la primera carta.");
     return;
@@ -404,7 +434,7 @@ function cantarEnvido() {
 
 function cantarRealEnvido() {
   if (!esperandoRespuestaEnvido || !envidoCantado) {
-    log("No podés cantar Real Envido ahora.");
+  safeDisable("btnRealEnvido", true);
     return;
   }
 
@@ -421,7 +451,7 @@ function cantarRealEnvido() {
 
 function cantarFaltaEnvido() {
   if (!esperandoRespuestaEnvido || !envidoCantado) {
-    log("No podés cantar Falta Envido ahora.");
+  safeDisable("btnFaltaEnvido", true);
     return;
   }
 
@@ -432,7 +462,7 @@ function cantarFaltaEnvido() {
 
   const falta = 15 - Math.max(puntosJugador, puntosBot);
 
-  envidoAcumulado += falta;
+  envidoAcumulado = falta;
   ultimoAporte = falta;
 
   decidirSiBotQuiere(tipoEnvidoActual);
@@ -445,9 +475,24 @@ function decidirSiBotQuiere(tipo) {
   botYaRespondioEnvido = true;
   esperandoRespuestaEnvido = true;
 
+  const eB = calcularEnvido(manoBot);
+
   setTimeout(() => {
-    const quiere = Math.random() < 0.6;
+
+    let quiere = true;
+
+    if (quienCantoEnvido === "jugador" && subiendoEnvido && eB <= 25) {
+      quiere = false;
+    } 
+    else if (quienCantoEnvido === "jugador" && subiendoEnvido && eB >= 29) {
+      quiere = true;
+    } 
+    else {
+      quiere = Math.random() < 0.3;
+    }
+
     responderEnvido(quiere);
+
   }, 600);
 }
 
@@ -504,9 +549,14 @@ function responderEnvido(quiere) {
   const eB = calcularEnvido(manoBot);
 
   if (!quiere) {
+
     if (quienCantoEnvido === "jugador") {
-      puntosJugador += 1;
-      log(`Bot no quiere. Ganás 1 punto.`);
+
+      const puntosNoQuerido = subiendoEnvido ? 2 : 1;
+
+      puntosJugador += puntosNoQuerido;
+      log(`Bot no quiere. Ganás ${puntosNoQuerido} punto${puntosNoQuerido>1?"s":""}.`);
+
     } else {
       puntosBot += 1;
       log(`No querés. Bot gana 1 punto.`);
@@ -515,13 +565,12 @@ function responderEnvido(quiere) {
     actualizarPuntos();
     botYaRespondioEnvido = false;
     subiendoEnvido = false;
-    
+
     if (!turnoJugador) {
       setTimeout(() => continuarDespuesDeEnvido(), 500);
     }
-
     return;
-  }
+}
 
   if (eJ > eB) {
     puntosJugador += envidoAcumulado;
