@@ -171,21 +171,31 @@ function botPlayFirst() {
   if (rondaTerminada || manoBot.length === 0) return;
 
   if (!envidoYaJugado && !envidoCantado && manoBot.length === 3) {
-    envidoYaJugado = true;
-    botCantaEnvidoTipo();
-    return;
-  }  
+      const eB = calcularEnvido(manoBot);
+
+      envidoYaJugado = true;
+
+      if (eB > 8) {
+          botCantaEnvidoTipo();
+          return;
+      }
+  }
+
   if (!esperandoRespuestaEnvido && !playedBot && botIntentarCantarTruco()) {
-    return;}
+    return;
+  }
+
   const cartaBot = chooseBotCardWhenStarting();
   manoBot.splice(manoBot.indexOf(cartaBot), 1);
   playedBot = cartaBot;
+
   log(`Bot jugó ${cartaBot.numero} de ${cartaBot.palo}`);
   mostrarCartasEnMesa("bot", cartaBot);
 
   turnoJugador = true;
   renderCartas();
 }
+
 
 
 function chooseBotCardWhenStarting() {
@@ -247,6 +257,15 @@ function resolveBaza() {
     primeraEmpatada = false;
     return;
   }
+if (bazasJugador === 1 && bazasBot === 1 && ganador === "tie") {
+    if (empiezaJugador) {
+        bazasJugador++; 
+    } else {
+        bazasBot++;
+    }
+    finishHandByBazas();
+    return;
+}
   if (bazasJugador === 2 || bazasBot === 2 || (bazasJugador + bazasBot === 3)) {
     finishHandByBazas();
     primeraEmpatada = false;
@@ -415,10 +434,11 @@ function cantarEnvido() {
      safeDisable("btnEnvido", true);
     return;
   }
-  if (!esperandoRespuestaEnvido && (manoJugador.length < 3 || manoBot.length < 3)) {
-    log("Sólo podés cantar Envido antes de jugar la primera carta.");
+if (!esperandoRespuestaEnvido && manoJugador.length < 3) {
+    log("Sólo podés cantar Envido antes de jugar tu primera carta.");
     return;
-  }
+}
+
 
   subiendoEnvido = true;
   envidoCantado = true;
@@ -501,6 +521,7 @@ function botCantaEnvidoTipo() {
   if (manoBot.length < 3) return;
 
   const eB = calcularEnvido(manoBot);
+    if (eB < 8) return;
   envidoCantado = true;
   esperandoRespuestaEnvido = true;
 
@@ -552,10 +573,8 @@ function responderEnvido(quiere) {
 
     if (quienCantoEnvido === "jugador") {
 
-      const puntosNoQuerido = subiendoEnvido ? 2 : 1;
-
-      puntosJugador += puntosNoQuerido;
-      log(`Bot no quiere. Ganás ${puntosNoQuerido} punto${puntosNoQuerido>1?"s":""}.`);
+      puntosJugador += 1;
+      log(`Bot no quiere. Ganás 1 punto.`);
 
     } else {
       puntosBot += 1;
