@@ -211,9 +211,8 @@ function botRespondToPlayer(cartaJugador) {
   if (rondaTerminada) return;
   let posibles = manoBot.filter(c => c.fuerza > cartaJugador.fuerza);
   let choice;
-  const bluff = Math.random() < 0.1;
+  const bluff = Math.random() < 0.15;
   if(bluff) {
-    log("Bot blufeó y jugó fuerte aun con mano débil");
     choice = manoBot.reduce((a,b) => a.fuerza > b.fuerza ? a : b);
   }
   if(!choice){
@@ -434,11 +433,10 @@ function cantarEnvido() {
      safeDisable("btnEnvido", true);
     return;
   }
-if (!esperandoRespuestaEnvido && manoJugador.length < 3) {
+if (!esperandoRespuestaEnvido && manoJugador.length < 2.1) {
     log("Sólo podés cantar Envido antes de jugar tu primera carta.");
     return;
 }
-
 
   subiendoEnvido = true;
   envidoCantado = true;
@@ -452,12 +450,17 @@ if (!esperandoRespuestaEnvido && manoJugador.length < 3) {
   decidirSiBotQuiere(tipoEnvidoActual);
 }
 
+
 function cantarRealEnvido() {
-  if (!esperandoRespuestaEnvido || !envidoCantado) {
-  safeDisable("btnRealEnvido", true);
+  if (envidoCantado && !esperandoRespuestaEnvido) {
+     safeDisable("btnRealEnvido", true);
     return;
   }
-
+  if (!esperandoRespuestaEnvido && manoJugador.length < 2.1) {
+    log("Sólo podés cantar Envido antes de jugar tu primera carta.");
+    return;
+}
+  envidoCantado = true;
   subiendoEnvido = true;
   tipoEnvidoActual = "real envido";
   log("Cantas Real Envido");
@@ -469,12 +472,17 @@ function cantarRealEnvido() {
   decidirSiBotQuiere(tipoEnvidoActual);
 }
 
+
 function cantarFaltaEnvido() {
-  if (!esperandoRespuestaEnvido || !envidoCantado) {
-  safeDisable("btnFaltaEnvido", true);
+  if (envidoCantado && !esperandoRespuestaEnvido) {
+     safeDisable("btnFaltaEnvido", true);
     return;
   }
-
+if (!esperandoRespuestaEnvido && manoJugador.length < 2.1) {
+    log("Sólo podés cantar Envido antes de jugar tu primera carta.");
+    return;
+}
+  envidoCantado = true;
   subiendoEnvido = true;
   tipoEnvidoActual = "falta envido";
   log("Cantas Falta Envido");
@@ -571,25 +579,28 @@ function responderEnvido(quiere) {
 
   if (!quiere) {
 
-    if (quienCantoEnvido === "jugador") {
+  if (quienCantoEnvido === "jugador") {
+    const puntos = envidoAcumulado > 3 ? 2 : 1;
+    puntosJugador += puntos;
+    log(`Bot no quiere. Ganás ${puntos} punto${puntos > 1 ? "s" : ""}.`);
+  } 
+  
+  else if (quienCantoEnvido === "bot") {
+    const puntos = envidoAcumulado > 3 ? 2 : 1;
+    puntosBot += puntos;
+    log(`No quisiste. Bot gana ${puntos} punto${puntos > 1 ? "s" : ""}.`);
+  }
 
-      puntosJugador += 1;
-      log(`Bot no quiere. Ganás 1 punto.`);
+  actualizarPuntos();
+  botYaRespondioEnvido = false;
+  subiendoEnvido = false;
 
-    } else {
-      puntosBot += 1;
-      log(`No querés. Bot gana 1 punto.`);
-    }
-
-    actualizarPuntos();
-    botYaRespondioEnvido = false;
-    subiendoEnvido = false;
-
-    if (!turnoJugador) {
-      setTimeout(() => continuarDespuesDeEnvido(), 500);
-    }
-    return;
+  if (!turnoJugador) {
+    setTimeout(() => continuarDespuesDeEnvido(), 500);
+  }
+  return;
 }
+
 
   if (eJ > eB) {
     puntosJugador += envidoAcumulado;
