@@ -17,6 +17,7 @@ let primeraEmpatada = false;
 let empiezaJugador = true;
 let turnoJugador = true;
 let trucoNivel = -1;
+let quienCantoTruco = null;
 
 let envidoCantado = false;
 let envidoNivel = 0;
@@ -326,46 +327,56 @@ function irseAlMazo() {
   const fuerzaBot = manoBot.reduce((acc, c) => acc + c.fuerza, 0);
 
   if (fuerzaBot >= 28) {
-    trucoNivel = 0;
-    log("Bot canta TRUCO");
+  trucoNivel = 0;
+  quienCantoTruco = "bot";
+  log("Bot canta TRUCO");
 
-safeDisable("btnTruco", true);
-safeDisable("btnEnvido", true);
-safeDisable("btnRealEnvido", true);
-safeDisable("btnFaltaEnvido", true);
+  safeDisable("btnTruco", true);
+  safeDisable("btnEnvido", true);
+  safeDisable("btnRealEnvido", true);
+  safeDisable("btnFaltaEnvido", true);
 
-btnQuiero.style.display = "inline-block";
-btnNoQuiero.style.display = "inline-block";
+  btnQuiero.style.display = "inline-block";
+  btnNoQuiero.style.display = "inline-block";
 
-btnQuiero.onclick = () => responderTruco(true);
-btnNoQuiero.onclick = () => responderTruco(false);
+  btnQuiero.onclick = () => responderTruco(true);
+  btnNoQuiero.onclick = () => responderTruco(false);
 
-return true;
-  }
+  return true;
+}
   return false;
 }
 
 
 function responderTruco(quiero) {
-    btnQuiero.style.display = "none";
-    btnNoQuiero.style.display = "none";
+  if (typeof btnQuiero !== "undefined") btnQuiero.style.display = "none";
+  if (typeof btnNoQuiero !== "undefined") btnNoQuiero.style.display = "none";
 
-    if (quiero) {
-        log("quisiste el truco");
-        trucoNivel = 1;
+  if (!quiero) {
+    log("No querido. Ganás 1 punto.");
+    puntosJugador += 1;
+    actualizarPuntos();
+    resetRonda();
+    quienCantoTruco = null;
+    return;
+  }
 
-        if (!turnoJugador && !playedBot && !rondaTerminada) {
-            setTimeout(() => {
-                if (!playedBot) botPlayFirst();
-            }, 400);
-        }
+  log("quisiste el truco");
+  trucoNivel = 1;
 
-    } else {
-        log("No querido. Ganás 1 punto.");
-        puntosJugador += 1;
-        actualizarPuntos();
-        resetRonda();
-    }
+  safeDisable("btnTruco", true);
+  safeDisable("btnEnvido", true);
+  safeDisable("btnRealEnvido", true);
+  safeDisable("btnFaltaEnvido", true);
+
+  if (quienCantoTruco === "bot") {
+    setTimeout(() => {
+      if (!playedBot && !rondaTerminada) {
+        botPlayFirst();
+      }
+    }, 200);
+  }
+  quienCantoTruco = null;
 }
 
 
@@ -374,6 +385,7 @@ function cantarTruco() {
   if (rondaTerminada || trucoNivel >= 1) return log("Ya está cantado el Truco o superior.");
 
   trucoNivel = 1;
+  quienCantoTruco = "jugador";
   log("Cantas TRUCO");
 
   safeDisable("btnTruco", true);
@@ -580,13 +592,13 @@ function responderEnvido(quiere) {
   if (!quiere) {
 
   if (quienCantoEnvido === "jugador") {
-    const puntos = envidoAcumulado > 3 ? 2 : 1;
+    const puntos = envidoAcumulado > 3.1 && envidoAcumulado <= 5 ? 2 : 1;
     puntosJugador += puntos;
     log(`Bot no quiere. Ganás ${puntos} punto${puntos > 1 ? "s" : ""}.`);
   } 
   
   else if (quienCantoEnvido === "bot") {
-    const puntos = envidoAcumulado > 3 ? 2 : 1;
+    const puntos = envidoAcumulado > 3.1 && envidoAcumulado <= 5 ? 2 : 1;
     puntosBot += puntos;
     log(`No quisiste. Bot gana ${puntos} punto${puntos > 1 ? "s" : ""}.`);
   }
