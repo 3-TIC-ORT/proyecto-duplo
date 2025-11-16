@@ -10,16 +10,20 @@
 }
 
 .carta-imagen {
-  width: 6vw;
+  width: 100%;
 }
 
 *{ box-sizing: border-box; margin: 0; padding: 0; }
 
-html,body { height: 100%; }
+html,body {
+  max-height: 700px;
+  max-width: 1366px;
+  height: 100%; 
+}
 
 body {
   font-family: Arial, Helvetica, sans-serif;
-  background: var(--verde-oscuro);
+  background-image: url(../TIMI/fondo.png);
   color: var(--blanco);
   display: flex;
   justify-content: center;
@@ -29,6 +33,7 @@ body {
 
 
 .juego-wrapper {
+  max-width: 1366px;
   width: var(--ancho-total);
   display: flex;
   gap: 18px;
