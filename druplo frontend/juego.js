@@ -722,24 +722,28 @@ function limpiarMesa(){
 }
 
 function mostrarOverlayGanaste() {
-  if (puntosJugador >= 15) return;
+  if (puntosJugador >= 15) {
   document.getElementById("overlay-title").textContent = "¡Ganaste!";
   document.getElementById("overlay-text").textContent = "Llegaste a 15 puntos.";
   document.getElementById("overlay-text").textContent = puntosJugador + " a " + puntosBot;
   document.getElementById("overlay").style.display = "flex";
+  }
 }
 
 function mostrarOverlayPerdiste() {
-  if (puntosBot >= 15) return;
+  if (puntosBot >= 15) {
   document.getElementById("overlay-title").textContent = "Perdiste";
   document.getElementById("overlay-text").textContent = "El bot llegó a 15 puntos.";
   document.getElementById("overlay-text").textContent = puntosJugador + " a " + puntosBot;
   document.getElementById("overlay").style.display = "flex";
+  }
 }
 
 function cerrarOverlay() {
   document.getElementById("overlay").style.display = "none";
 }
 
+mostrarOverlayGanaste()
+mostrarOverlayPerdiste()
 
 document.addEventListener("DOMContentLoaded", repartir);
