@@ -16,9 +16,8 @@
 *{ box-sizing: border-box; margin: 0; padding: 0; }
 
 html,body {
-  max-height: 700px;
+  max-height: 624px;
   max-width: 1366px;
-  height: 100%; 
 }
 
 body {
@@ -29,11 +28,13 @@ body {
   justify-content: center;
   align-items: flex-start;
   padding-top: 6px;
+  height: 624px;
 }
 
 
 .juego-wrapper {
   max-width: 1366px;
+  height: 624px;
   width: var(--ancho-total);
   display: flex;
   gap: 18px;
@@ -65,6 +66,16 @@ body {
   margin-bottom: 6px;
 }
 
+#mesa.mesa {
+  background-color: rgba(0, 0, 0, 0);
+  
+}
+
+#mesa-center.mesa-center {
+  position: absolute;
+  top: 50%;
+  height: 250px;
+}
 
 .manos {
   display: flex;
@@ -94,12 +105,9 @@ body {
 
 .mesa {
   width: 740px;
-  height: 260px;
+  height: 100px;
   margin: 6px auto 20px auto;
-  background: linear-gradient(180deg, var(--verde-mesa-degrade-from), var(--verde-mesa-degrade-to));
   border-radius: 12px;
-  border: 3px solid rgba(0,60,0,0.6);
-  box-shadow: inset 0 10px 30px rgba(0,0,0,0.25);
   position: relative;
   display: block;
 }
@@ -111,13 +119,14 @@ body {
   top: 32%;
   transform: translate(-50%,-30%);
   width: 420px;
-  height: 130px;
+  height: 100px;
   border-radius: 10px;
-  background: rgba(3,50,6,0.2);
-  box-shadow: 2px 2px 6px rgba(0,0,0,0.4);
+  background: rgba(3, 50, 6, 0);
 }
 
 .botonera {
+  position: absolute;
+  bottom: 0;
   width: 100%;
   display: flex;
   justify-content: center;
@@ -145,17 +154,20 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
   border-radius: 10px;
   margin-right: 10px;
   border: 2px solid rgba(0,60,0,0.6);
-  height: 780px; 
+  height: 630px; 
   position: relative;
 }
 
 .scoreboard h3, .log-box h3 { margin-bottom: 8px; }
 .scoreboard p { margin-bottom:  6px; }
 
+.log-box {
+  height: 100px;
+}
 
 #log {
   background: #0a0a0a;
-  height: 600px;
+  height: 490px;
   overflow-y: auto;
   padding: 10px;
   border-radius: 8px;
@@ -174,12 +186,11 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
   position: relative;
   width: 140%;          /* más ancha */
   height: 380px;       /* más alta */
-  background: #1f5c2e;
-  border: 4px solid #093b18;
+  background: #1f5c2e00;
+  border: 4px solid #093b1800;
   border-radius: 16px;
   overflow: hidden;
   margin: 30px auto;
-  box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.6);
 }
 
 
