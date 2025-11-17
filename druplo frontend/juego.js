@@ -18,9 +18,11 @@ let empiezaJugador = true;
 let turnoJugador = true;
 let trucoNivel = -1;
 let quienCantoTruco = null;
+let posiblesCartasJugador = [];
 
 let envidoCantado = false;
 let envidoNivel = 0;
+let timeoutEnvido = null;
 let quienCantoEnvido = null;
 let subiendoEnvido = false;
 let envidoAcumulado = 0;
@@ -327,6 +329,10 @@ function irseAlMazo() {
   const fuerzaBot = manoBot.reduce((acc, c) => acc + c.fuerza, 0);
 
   if (fuerzaBot >= 23) {
+    if (timeoutEnvido) {
+      clearTimeout(timeoutEnvido);
+      timeoutEnvido = null;
+  }  
   trucoNivel = 0;
   quienCantoTruco = "bot";
   log("Bot canta TRUCO");
