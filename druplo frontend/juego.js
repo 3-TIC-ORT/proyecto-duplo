@@ -326,7 +326,7 @@ function irseAlMazo() {
 
   const fuerzaBot = manoBot.reduce((acc, c) => acc + c.fuerza, 0);
 
-  if (fuerzaBot >= 28) {
+  if (fuerzaBot >= 23) {
   trucoNivel = 0;
   quienCantoTruco = "bot";
   log("Bot canta TRUCO");
@@ -353,10 +353,10 @@ function responderTruco(quiero) {
   if (typeof btnNoQuiero !== "undefined") btnNoQuiero.style.display = "none";
 
   if (!quiero) {
-    log("No querido. Ganás 1 punto.");
-    puntosJugador += 1;
+    log("No querido. bot gana 1 punto.");
+    puntosBot += 1;
     actualizarPuntos();
-    resetRonda();
+    setTimeout(repartir, 1000);
     quienCantoTruco = null;
     return;
   }
@@ -422,8 +422,8 @@ function decidirRespuestaTruco(puntosSiQuiere, puntosSiNoQuiere) {
 
   let quiere = false;
 
-  if (fuerzaBot >= 28) quiere = true;
-  else if (fuerzaBot >= 22) quiere = Math.random() < 0.7;
+  if (fuerzaBot >= 25) quiere = true;
+  else if (fuerzaBot >= 20) quiere = Math.random() < 0.7;
   else quiere = Math.random() < 0.15;
 
   setTimeout(() => {
