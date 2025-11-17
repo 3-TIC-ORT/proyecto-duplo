@@ -721,5 +721,21 @@ function limpiarMesa(){
   offsetBot = 0;
 }
 
+function mostrarOverlayGanaste() {
+  document.getElementById("overlay-title").textContent = "¡Ganaste!";
+  document.getElementById("overlay-text").textContent = "Llegaste a 15 puntos.";
+  document.getElementById("overlay").style.display = "flex";
+}
+
+function mostrarOverlayPerdiste() {
+  document.getElementById("overlay-title").textContent = "Perdiste";
+  document.getElementById("overlay-text").textContent = "El bot llegó a 15 puntos.";
+  document.getElementById("overlay").style.display = "flex";
+}
+
+function cerrarOverlay() {
+  document.getElementById("overlay").style.display = "none";
+}
+
 
 document.addEventListener("DOMContentLoaded", repartir);
