@@ -336,6 +336,8 @@ function irseAlMazo() {
   trucoNivel = 0;
   quienCantoTruco = "bot";
   log("Bot canta TRUCO");
+  mostrarAvisoCanto("¡TRUCO!");
+
 
   safeDisable("btnTruco", true);
   safeDisable("btnEnvido", true);
@@ -547,7 +549,8 @@ function botCantaEnvidoTipo() {
   if (manoBot.length < 3) return;
 
   const eB = calcularEnvido(manoBot);
-    if (eB < 8) return;
+  if (eB < 8) return;
+
   envidoCantado = true;
   esperandoRespuestaEnvido = true;
 
@@ -557,9 +560,12 @@ function botCantaEnvidoTipo() {
   quienCantoEnvido = "bot";
 
   log("Bot canta Envido");
+
+  // 👉 ESTA LÍNEA DEBE ESTAR FUNCIONANDO
+  mostrarAvisoCanto("¡ENVIDO!");
+
   mostrarBotonesEnvido();
 }
-
 
 function mostrarBotonesEnvido() {
   document.getElementById("btnQuiero").style.display = "inline-block";
@@ -728,24 +734,38 @@ function limpiarMesa(){
 }
 
 function mostrarOverlayGanaste() {
-  if (puntosJugador >= 15) return;
+  if (puntosJugador >= 15) {
   document.getElementById("overlay-title").textContent = "¡Ganaste!";
   document.getElementById("overlay-text").textContent = "Llegaste a 15 puntos.";
   document.getElementById("overlay-text").textContent = puntosJugador + " a " + puntosBot;
   document.getElementById("overlay").style.display = "flex";
+  }
 }
 
 function mostrarOverlayPerdiste() {
-  if (puntosBot >= 15) return;
+  if (puntosBot >= 15) {
   document.getElementById("overlay-title").textContent = "Perdiste";
   document.getElementById("overlay-text").textContent = "El bot llegó a 15 puntos.";
   document.getElementById("overlay-text").textContent = puntosJugador + " a " + puntosBot;
   document.getElementById("overlay").style.display = "flex";
+  }
 }
 
 function cerrarOverlay() {
   document.getElementById("overlay").style.display = "none";
 }
 
+mostrarOverlayGanaste()
+mostrarOverlayPerdiste()
 
 document.addEventListener("DOMContentLoaded", repartir);
+
+function mostrarAvisoCanto(texto) {
+  const div = document.getElementById("avisoCanto"); // o avisoCanto si renombraste
+  div.textContent = texto;
+  div.style.display = "block";
+
+  setTimeout(() => {
+    div.style.display = "none";
+  }, 2000);
+}

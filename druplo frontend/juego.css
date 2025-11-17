@@ -9,6 +9,13 @@
   --ancho-total: 1366px;
 }
 
+@font-face {
+  font-family: 'jsMath-cmbx10';
+  src: url('../TIMI/Fuentes/jsMath-cmbx10.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
 .carta-imagen {
   width: 100%;
 }
@@ -18,10 +25,10 @@
 html,body {
   max-height: 624px;
   max-width: 1366px;
+  font-family: 'jsMath-cmbx10', sans-serif;
 }
 
 body {
-  font-family: Arial, Helvetica, sans-serif;
   background-image: url(../TIMI/fondo.png);
   color: var(--blanco);
   display: flex;
@@ -132,9 +139,11 @@ body {
   justify-content: center;
   gap: 14px;
   margin-top: 170px;
+  font-family: 'jsMath-cmbx10', sans-serif;
 }
 .botonera button {
-  background: #ff0b0b;
+  font-family: 'jsMath-cmbx10', sans-serif;
+  background: #AE3C15;
   color: white;
   border: none;
   padding: 10px 16px;
@@ -242,5 +251,22 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
   text-align: center;
   max-width: 400px;
   box-shadow: 0 0 20px black;
+}
+
+.aviso-canto {
+  position: absolute;       /* NO mueve nada, solo flota */
+  top: 20px;                /* <-- Cambiá esto a donde quieras */
+  right: 20px;              /* <-- Cambiá esto también si querés */
+  background: #ffe600;
+  padding: 12px 18px;
+  border-radius: 8px;
+  font-size: 20px;
+  font-weight: bold;
+  color: black;
+  border: 2px solid #000;
+  box-shadow: 0 0 8px #0004;
+  display: none;            /* Oculto por defecto */
+  z-index: 9999;            /* Siempre arriba, sin tapar botones */
+  pointer-events: none;     /* No interfiere con clics */
 }
 
