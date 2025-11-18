@@ -77,16 +77,24 @@ function crearMazo(){
 
 function crearMazoCompleto() {
   mazoCompleto = [];
+
+  const fuerzasAgregadas = new Set();
+
   for (const p of palos) {
     for (const n of numeros) {
-      mazoCompleto.push({
-        numero: n,
-        palo: p,
-        fuerza: fuerza[`${n}${p}`] || fuerza[n] || 0
-      });
+      const f = fuerza[`${n}${p}`] || fuerza[n] || 0;
+      if (!fuerzasAgregadas.has(f)) {
+        mazoCompleto.push({
+          numero: n,
+          palo: p,
+          fuerza: f
+        });
+        fuerzasAgregadas.add(f);
+      }
     }
   }
 }
+
 
 
 function sacarCarta(){
@@ -130,6 +138,15 @@ function repartir(){
   limpiarMesa();
   log(`Nueva mano. ${empiezaJugador ? "Vos sos mano" : "Bot es mano"}.`);
   if(!empiezaJugador) setTimeout(botPlayFirst, 700);
+}
+
+
+function obtenerCartasPosiblesJugador() {
+  const cartasPosibles = mazoCompleto.filter(c =>
+    !estaEn(manoBot, c) &&
+    !estaEn(cartasJugadas, c)
+  );
+  return cartasPosibles;
 }
 
 
@@ -272,21 +289,17 @@ function botRespondToPlayer(cartaJugador) {
 
 
 function probJugadorGanaContra(cartaBot) {
-  if (!posiblesCartasJugador || posiblesCartasJugador.length === 0) return 0.5;
+  const cartasPosibles = obtenerCartasPosiblesJugador();
+  if (cartasPosibles.length === 0) return 0.5;
 
-  let total = 0;
   let gana = 0;
+  cartasPosibles.forEach(c => {
+    if (c.fuerza > cartaBot.fuerza) gana++;
+  });
 
-  for (const mano of posiblesCartasJugador) {
-    for (const carta of mano) {
-      total++;
-      if (carta.fuerza > cartaBot.fuerza) {
-        gana++;
-      }
-    }
-  }
-  return gana / total;
+  return gana / cartasPosibles.length;
 }
+
 
 
 function botShouldTruco() {
@@ -294,9 +307,9 @@ function botShouldTruco() {
   const mejorCartaBot = manoBot.slice().sort((a, b) => b.fuerza - a.fuerza)[0];
 
   // Probabilidad de que el jugador tenga algo más fuerte
-  const probJugadorFuerte = probJugadorGanaContra(mejorCartaBot);
+  const probJugadorFuerte = probJugadorGanaContra(mejorCartaBot).toFixed(3);
 
-  console.log("Prob jugador supera mi mejor carta:", probJugadorFuerte);
+  console.log("Prob jugador supera mi mejor carta: "+ probJugadorFuerte);
 
   // Lógica inteligente:
   //  
@@ -739,20 +752,10 @@ function responderEnvido(quiere) {
   }
   return;
 }
-posiblesCartasJugador = posiblesManosConEnvido(
-  eJ,
-  manoBot,
-  cartasJugadas
-);
+posiblesCartasJugador = obtenerCartasPosiblesJugador();
 
-console.log("Posibles manos:", posiblesCartasJugador.length);
-posiblesCartasJugador.forEach((mano, i) => {
-  console.log(
-    `Mano ${i + 1}: ${mano[0].numero} de ${mano[0].palo}, ` +
-    `${mano[1].numero} de ${mano[1].palo}, ` +
-    `${mano[2].numero} de ${mano[2].palo}`
-  );
-});
+console.log("Cartas posibles del jugador:");
+posiblesCartasJugador.forEach(c => console.log(`${c.numero} de ${c.palo}`));
 
   if (eJ > eB) {
     puntosJugador += envidoAcumulado;
@@ -887,7 +890,6 @@ function cerrarOverlay() {
 mostrarOverlayGanaste()
 mostrarOverlayPerdiste()
 
-document.addEventListener("DOMContentLoaded", repartir);
 
 function mostrarAvisoCanto(texto) {
   const div = document.getElementById("avisoCanto"); // o avisoCanto si renombraste
@@ -898,3 +900,5 @@ function mostrarAvisoCanto(texto) {
     div.style.display = "none";
   }, 2000);
 }
+
+document.addEventListener("DOMContentLoaded", repartir);
