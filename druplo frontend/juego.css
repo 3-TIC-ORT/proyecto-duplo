@@ -79,7 +79,7 @@ body {
 }
 
 #mesa-center.mesa-center {
-  position: absolute;
+  position: relative;
   top: 50%;
   height: 250px;
 }
@@ -93,9 +93,19 @@ body {
 }
 
 
-.manos-bot { width: 45%; justify-content: flex-start; padding-left: 40px; }
+.manos-bot {
+  display: flex;
+  justify-content: flex-end; /* alinea a la derecha */
+  gap: 10px;
+  width: 45%; /* ya lo tienes */
+  padding-left: 0; /* elimina padding si quieres precisión */
+  transform: translateX(-300px);
+}
 .manos-jugador { width: 45%; justify-content: flex-end; padding-right: 40px; }
 
+#bot {
+  height: 126px;
+}
 
 .carta {
   width: 84px;
@@ -134,7 +144,7 @@ body {
 .botonera {
   position: absolute;
   bottom: 0;
-  width: 100%;
+  width: 90%;
   display: flex;
   justify-content: center;
   gap: 14px;
@@ -145,7 +155,8 @@ body {
   font-family: 'jsMath-cmbx10', sans-serif;
   background: #AE3C15;
   color: white;
-  border: none;
+  border: 1px solid black;
+  text-shadow: 0 0 4px #000000;
   padding: 10px 16px;
   border-radius: 8px;
   cursor: pointer;
@@ -155,6 +166,9 @@ body {
 .botonera button:active { transform: translateY(2px); }
 button:disabled { opacity: 0.5; cursor: not-allowed; }
 
+#btnMazo {
+  background: #11110D;
+}
 
 .sidebar {
   width: 300px;
@@ -221,12 +235,14 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
   right: 45%;
   top: 15%;
   transform: translate(150px, calc(var(--offset, 0px))) rotate(6deg);
+  
 }
 
 .carta-bot {
-  left: 45%;
+  position: absolute;
+  left: 70%;
   top: 25%;
-  transform: translate(-150px, calc(var(--offset, 0px))) rotate(-6deg);
+  transform: translateX(-500px);
 }
 
 .overlay {
