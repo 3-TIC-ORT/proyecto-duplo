@@ -6,8 +6,12 @@ const fuerza = {
 };
 
 let mazo = [];
+let mazoCompleto = [];
+crearMazoCompleto();
 let manoJugador = [];
 let manoBot = [];
+let cartasJugadas = [];
+let posiblesCartasJugador = [];
 let puntosJugador = 0;
 let puntosBot = 0;
 
@@ -21,6 +25,7 @@ let quienCantoTruco = null;
 
 let envidoCantado = false;
 let envidoNivel = 0;
+let envidoJugadorDeclarado = null;
 let quienCantoEnvido = null;
 let subiendoEnvido = false;
 let envidoAcumulado = 0;
@@ -68,9 +73,33 @@ function crearMazo(){
   }
 }
 
+
+function crearMazoCompleto() {
+  mazoCompleto = [];
+  for (const p of palos) {
+    for (const n of numeros) {
+      mazoCompleto.push({
+        numero: n,
+        palo: p,
+        fuerza: fuerza[`${n}${p}`] || fuerza[n] || 0
+      });
+    }
+  }
+}
+
+
 function sacarCarta(){
   const i = Math.floor(Math.random()*mazo.length);
   return mazo.splice(i,1)[0];
+}
+
+
+function cartasIguales(c1, c2) {
+  return c1.numero === c2.numero && c1.palo === c2.palo;
+}
+
+function estaEn(lista, carta) {
+  return lista.some(c => cartasIguales(c, carta));
 }
 
 
@@ -152,8 +181,11 @@ function playerPlay(i){
     return;
   }
   if(!turnoJugador || rondaTerminada) return;
-
   const carta = manoJugador.splice(i,1)[0];
+
+  cartasJugadas.push(carta);
+  actualizarPosiblesManos(carta);
+
   playedPlayer = carta;
   log(`Jugaste ${carta.numero} de ${carta.palo}`);
   mostrarCartasEnMesa("jugador", carta);
@@ -189,6 +221,7 @@ function botPlayFirst() {
   const cartaBot = chooseBotCardWhenStarting();
   manoBot.splice(manoBot.indexOf(cartaBot), 1);
   playedBot = cartaBot;
+  cartasJugadas.push(cartaBot);
 
   log(`Bot jugó ${cartaBot.numero} de ${cartaBot.palo}`);
   mostrarCartasEnMesa("bot", cartaBot);
@@ -212,7 +245,7 @@ function botRespondToPlayer(cartaJugador) {
   if (rondaTerminada) return;
   let posibles = manoBot.filter(c => c.fuerza > cartaJugador.fuerza);
   let choice;
-  const bluff = Math.random() < 0.15;
+  const bluff = Math.random() < 0.18;
   if(bluff) {
     choice = manoBot.reduce((a,b) => a.fuerza > b.fuerza ? a : b);
   }
@@ -228,6 +261,8 @@ function botRespondToPlayer(cartaJugador) {
   }
   manoBot.splice(manoBot.indexOf(choice),1);
   playedBot = choice;
+  cartasJugadas.push(choice);
+
   log(`Bot jugó ${choice.numero} de ${choice.palo}`);
   mostrarCartasEnMesa("bot", choice);
   resolveBaza();
@@ -537,6 +572,74 @@ function decidirSiBotQuiere(tipo) {
 }
 
 
+function actualizarPosiblesManos(cartaTirada) {
+  console.log("=== FILTRANDO POSIBLES MANOS ===");
+  console.log("Carta tirada:", cartaTirada);
+  console.log("Envido declarado:", envidoJugadorDeclarado);
+  console.log("Manos posibles ANTES:", posiblesCartasJugador ? posiblesCartasJugador.length : 0);
+
+  if (!posiblesCartasJugador || posiblesCartasJugador.length === 0) {
+    console.log("No había manos posibles para filtrar. (posiblesCartasJugador vacío)");
+    return;
+  }
+
+  posiblesCartasJugador = posiblesCartasJugador.filter(mano => {
+    const contieneCarta = mano.some(c =>
+      c.numero === cartaTirada.numero && c.palo === cartaTirada.palo
+    );
+    if (!contieneCarta) return false;
+
+    const envidoMano = calcularEnvido(mano);
+    if (envidoJugadorDeclarado == null) {
+      return true;
+    }
+    return envidoMano === envidoJugadorDeclarado;
+  });
+
+  console.log("Manos posibles DESPUÉS:", posiblesCartasJugador.length);
+  if (posiblesCartasJugador.length > 0) {
+    posiblesCartasJugador.forEach((mano, i) => {
+      console.log(
+        `Mano ${i + 1}: ${mano[0].numero} de ${mano[0].palo}, ` +
+        `${mano[1].numero} de ${mano[1].palo}, ${mano[2].numero} de ${mano[2].palo}`
+      );
+    });
+  } else {
+    console.warn("NO HAY ENVIDO NO HAY LOG");
+  }
+}
+
+
+function posiblesManosConEnvido(puntajeBuscado, cartasBot, cartasJugadas) {
+  const mazoFiltrado = mazoCompleto.filter(c =>
+    !estaEn(cartasBot, c) &&
+    !estaEn(cartasJugadas, c)
+  );
+
+  const posibles = [];
+
+  for (let i = 0; i < mazoFiltrado.length; i++) {
+    for (let j = i + 1; j < mazoFiltrado.length; j++) {
+
+      const c1 = mazoFiltrado[i];
+      const c2 = mazoFiltrado[j];
+      const compartenPalo = c1.palo === c2.palo;
+
+      if (!compartenPalo && puntajeBuscado > 20) continue;
+
+      for (let k = j + 1; k < mazoFiltrado.length; k++) {
+        const mano = [c1, c2, mazoFiltrado[k]];
+
+        if (calcularEnvido(mano) === puntajeBuscado) {
+          posibles.push(mano);
+        }
+      }
+    }
+  }
+  return posibles;
+}
+
+
 function botCantaEnvidoTipo() {
   if (manoBot.length < 3) return;
 
@@ -588,6 +691,7 @@ function responderEnvido(quiere) {
 
   const eJ = calcularEnvido(manoJugador);
   const eB = calcularEnvido(manoBot);
+  envidoJugadorDeclarado = eJ;
 
   if (!quiere) {
 
@@ -612,7 +716,20 @@ function responderEnvido(quiere) {
   }
   return;
 }
+posiblesCartasJugador = posiblesManosConEnvido(
+  eJ,
+  manoBot,
+  cartasJugadas
+);
 
+console.log("Posibles manos:", posiblesCartasJugador.length);
+posiblesCartasJugador.forEach((mano, i) => {
+  console.log(
+    `Mano ${i + 1}: ${mano[0].numero} de ${mano[0].palo}, ` +
+    `${mano[1].numero} de ${mano[1].palo}, ` +
+    `${mano[2].numero} de ${mano[2].palo}`
+  );
+});
 
   if (eJ > eB) {
     puntosJugador += envidoAcumulado;
@@ -653,6 +770,7 @@ function resetEnvido() {
   envidoEnCurso = false;
   esperandoRespuestaEnvido = false;
   tipoEnvidoActual = "envido";
+  envidoJugadorDeclarado = null;
 }
 
 
