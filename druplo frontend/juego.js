@@ -806,12 +806,17 @@ function continuarDespuesDeEnvido() {
   }
 }
 
-
 function actualizarPuntos(){
   document.getElementById("puntosJugador").textContent = puntosJugador;
   document.getElementById("puntosBot").textContent = puntosBot;
-}
 
+  if (puntosJugador >= 15) {
+    setTimeout(() => mostrarPopupFinal("jugador"), 50);
+  }
+  if (puntosBot >= 15) {
+    setTimeout(() => mostrarPopupFinal("bot"), 50);
+  }
+}
 
 function log(txt){
   const d = document.getElementById("log");
@@ -894,6 +899,21 @@ mostrarOverlayPerdiste()
 function mostrarAvisoCanto(texto) {
   const div = document.getElementById("avisoCanto"); // o avisoCanto si renombraste
   div.textContent = texto;
+  div.style.display = "block";
+
+  setTimeout(() => {
+    div.style.display = "none";
+  }, 2000);
+}
+
+function mostrarAvisoResultado(texto, gano) {
+  const div = document.getElementById("avisoResultado");
+
+  div.textContent = texto;
+
+  // cambia color según si ganó o perdió
+  div.className = "aviso-resultado " + (gano ? "ganado" : "perdido");
+
   div.style.display = "block";
 
   setTimeout(() => {
