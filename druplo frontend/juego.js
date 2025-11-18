@@ -379,31 +379,48 @@ siguiente = empiezaJugador ? "player" : "bot";
   if (!turnoJugador) setTimeout(botPlayFirst, 600);
 }
 
-
 function finishHandByBazas(){
-  rondaTerminada = true;
-  let pts = 1;
-  if(trucoNivel === 0) pts = 1;
-  else if(trucoNivel === 1) pts = 2;
-  else if(trucoNivel === 2) pts = 3;
-  else if (trucoNivel === 3) pts = 4;
+    rondaTerminada = true;
+    let pts = 1;
+    if(trucoNivel === 0) pts = 1;
+    else if(trucoNivel === 1) pts = 2;
+    else if(trucoNivel === 2) pts = 3;
+    else if (trucoNivel === 3) pts = 4;
+    
+    let mensaje = ""; // Variable para guardar el mensaje del aviso
+    let ganoJugador = false; // Variable para saber si ganó el jugador
 
-  if(bazasJugador > bazasBot){
-    puntosJugador += pts;
-    log(`Ganaste la mano (+${pts})`);
-    empiezaJugador = true;
-  } else if(bazasBot > bazasJugador){
-    puntosBot += pts;
-    log(`Bot gana la mano (+${pts})`);
-    empiezaJugador = false;
-  } else {
-    if(empiezaJugador){ puntosJugador += pts; log(`Empate: gana quien es mano (Vos) (+${pts})`); }
-    else { puntosBot += pts; log(`Empate: gana quien es mano (Bot) (+${pts})`); }
-  }
-  actualizarPuntos();
-  setTimeout(repartir, 1200);
+    if(bazasJugador > bazasBot){
+        puntosJugador += pts;
+        mensaje = `GANASTE LA MANO`;
+        ganoJugador = true;
+        log(mensaje);
+        empiezaJugador = true;
+    } else if(bazasBot > bazasJugador){
+        puntosBot += pts;
+        mensaje = `PERDISTE LA MANO`;
+        ganoJugador = false;
+        log(mensaje);
+        empiezaJugador = false;
+    } else {
+        if(empiezaJugador){
+            puntosJugador += pts;
+            mensaje = `Empate: gana quien es mano (Vos) (+${pts})`;
+            ganoJugador = true;
+        } else {
+            puntosBot += pts;
+            mensaje = `Empate: gana quien es mano (Bot) (+${pts})`;
+            ganoJugador = false;
+        }
+        log(mensaje);
+    }
+    
+    // 💡 AGREGAR ESTA LÍNEA AQUÍ
+    mostrarAvisoResultado(mensaje.split(":")[0].replace(" (+", " (") , ganoJugador); 
+    
+    actualizarPuntos();
+    setTimeout(repartir, 1200);
 }
-
 
 function irseAlMazo() {
   let puntos = 1;
