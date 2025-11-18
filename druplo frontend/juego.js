@@ -26,6 +26,7 @@ let quienCantoTruco = null;
 let envidoCantado = false;
 let envidoNivel = 0;
 let envidoJugadorDeclarado = null;
+let timeoutEnvido = null;
 let quienCantoEnvido = null;
 let subiendoEnvido = false;
 let envidoAcumulado = 0;
@@ -361,10 +362,16 @@ function irseAlMazo() {
 
   const fuerzaBot = manoBot.reduce((acc, c) => acc + c.fuerza, 0);
 
-  if (fuerzaBot >= 28) {
+  if (fuerzaBot >= 23) {
+    if (timeoutEnvido) {
+      clearTimeout(timeoutEnvido);
+      timeoutEnvido = null;
+  }  
   trucoNivel = 0;
   quienCantoTruco = "bot";
   log("Bot canta TRUCO");
+  mostrarAvisoCanto("¡TRUCO!");
+
 
   safeDisable("btnTruco", true);
   safeDisable("btnEnvido", true);
@@ -388,10 +395,10 @@ function responderTruco(quiero) {
   if (typeof btnNoQuiero !== "undefined") btnNoQuiero.style.display = "none";
 
   if (!quiero) {
-    log("No querido. Ganás 1 punto.");
-    puntosJugador += 1;
+    log("No querido. bot gana 1 punto.");
+    puntosBot += 1;
     actualizarPuntos();
-    resetRonda();
+    setTimeout(repartir, 1000);
     quienCantoTruco = null;
     return;
   }
@@ -457,8 +464,8 @@ function decidirRespuestaTruco(puntosSiQuiere, puntosSiNoQuiere) {
 
   let quiere = false;
 
-  if (fuerzaBot >= 28) quiere = true;
-  else if (fuerzaBot >= 22) quiere = Math.random() < 0.7;
+  if (fuerzaBot >= 25) quiere = true;
+  else if (fuerzaBot >= 20) quiere = Math.random() < 0.7;
   else quiere = Math.random() < 0.15;
 
   setTimeout(() => {
@@ -644,7 +651,8 @@ function botCantaEnvidoTipo() {
   if (manoBot.length < 3) return;
 
   const eB = calcularEnvido(manoBot);
-    if (eB < 8) return;
+  if (eB < 8) return;
+
   envidoCantado = true;
   esperandoRespuestaEnvido = true;
 
@@ -654,9 +662,11 @@ function botCantaEnvidoTipo() {
   quienCantoEnvido = "bot";
 
   log("Bot canta Envido");
+
+  mostrarAvisoCanto("¡ENVIDO!");
+
   mostrarBotonesEnvido();
 }
-
 
 function mostrarBotonesEnvido() {
   document.getElementById("btnQuiero").style.display = "inline-block";
@@ -839,5 +849,39 @@ function limpiarMesa(){
   offsetBot = 0;
 }
 
+function mostrarOverlayGanaste() {
+  if (puntosJugador >= 15) {
+  document.getElementById("overlay-title").textContent = "¡Ganaste!";
+  document.getElementById("overlay-text").textContent = "Llegaste a 15 puntos.";
+  document.getElementById("overlay-text").textContent = puntosJugador + " a " + puntosBot;
+  document.getElementById("overlay").style.display = "flex";
+  }
+}
+
+function mostrarOverlayPerdiste() {
+  if (puntosBot >= 15) {
+  document.getElementById("overlay-title").textContent = "Perdiste";
+  document.getElementById("overlay-text").textContent = "El bot llegó a 15 puntos.";
+  document.getElementById("overlay-text").textContent = puntosJugador + " a " + puntosBot;
+  document.getElementById("overlay").style.display = "flex";
+  }
+}
+
+function cerrarOverlay() {
+  document.getElementById("overlay").style.display = "none";
+}
+
+mostrarOverlayGanaste()
+mostrarOverlayPerdiste()
 
 document.addEventListener("DOMContentLoaded", repartir);
+
+function mostrarAvisoCanto(texto) {
+  const div = document.getElementById("avisoCanto"); // o avisoCanto si renombraste
+  div.textContent = texto;
+  div.style.display = "block";
+
+  setTimeout(() => {
+    div.style.display = "none";
+  }, 2000);
+}

@@ -7,6 +7,14 @@
   <link rel="stylesheet" href="juego.css" />
 </head>
 <body>
+  <div id="overlay" class="overlay">
+    <div class="overlay-content">
+      <h2 id="overlay-title">GANASTE</h2>
+      <p id="overlay-text">felicitasiones pudiste superar al bot.</p>
+  
+      <button onclick="cerrarOverlay()">Cerrar</button>
+    </div>
+  </div>
   <div class="juego-wrapper">
 
     
@@ -37,15 +45,15 @@
 
      
       <div class="botonera">
-        <button id="btnTruco" onclick="cantarTruco()">Truco</button>
-        <button id="btnRetruco" onclick="cantarRetruco()">Retruco</button>
-        <button id="btnValecuatro" onclick="cantarValecuatro()">Valecuatro</button>
-        <button id="btnEnvido" onclick="cantarEnvido()">Envido</button>
-        <button id="btnRealEnvido" onclick="cantarRealEnvido()">Real Envido</button>
-        <button id="btnFaltaEnvido" onclick="cantarFaltaEnvido()">Falta Envido</button>
+        <button id="btnTruco" onclick="cantarTruco()">TRUCO</button>
+        <button id="btnRetruco" onclick="cantarRetruco()">RETRUCO</button>
+        <button id="btnValecuatro" onclick="cantarValecuatro()">VALECUATRO</button>
+        <button id="btnEnvido" onclick="cantarEnvido()">ENVIDO</button>
+        <button id="btnRealEnvido" onclick="cantarRealEnvido()">REAL ENVIDO</button>
+        <button id="btnFaltaEnvido" onclick="cantarFaltaEnvido()">FALTA ENVIDO</button>
         <button id="btnMazo" onclick="irseAlMazo()">Irse al mazo</button>
-        <button id="btnQuiero" onclick="responderEnvido(true)" style="display:none">Quiero</button>
-        <button id="btnNoQuiero" onclick="responderEnvido(false)" style="display:none">No Quiero</button>
+        <button id="btnQuiero" onclick="responderEnvido(true)" style="display:none">QUIERO</button>
+        <button id="btnNoQuiero" onclick="responderEnvido(false)" style="display:none">NO QUIERO</button>
       </div>
     </div>
 
@@ -66,5 +74,7 @@
 
   
   <script src="juego.js"></script>
+
+  <div id="avisoCanto" class="aviso-canto"></div>
 </body>
 </html>
