@@ -214,10 +214,10 @@ function botPlayFirst() {
           return;
       }
   }
-
-  if (!esperandoRespuestaEnvido && !playedBot && botIntentarCantarTruco()) {
+  if (trucoNivel >= 0 && botShouldTruco()) {
+    botCantaTruco();
     return;
-  }
+}
 
   const cartaBot = chooseBotCardWhenStarting();
   manoBot.splice(manoBot.indexOf(cartaBot), 1);
@@ -241,7 +241,7 @@ function chooseBotCardWhenStarting() {
 
 
 function botRespondToPlayer(cartaJugador) {
-  if (!esperandoRespuestaEnvido && !playedBot && botIntentarCantarTruco()) {
+  if (!esperandoRespuestaEnvido && !playedBot && botShouldTruco()) {
     return;}
   if (rondaTerminada) return;
   let posibles = manoBot.filter(c => c.fuerza > cartaJugador.fuerza);
@@ -268,6 +268,51 @@ function botRespondToPlayer(cartaJugador) {
   mostrarCartasEnMesa("bot", choice);
   resolveBaza();
   renderCartas();
+}
+
+
+function probJugadorGanaContra(cartaBot) {
+  if (!posiblesCartasJugador || posiblesCartasJugador.length === 0) return 0.5;
+
+  let total = 0;
+  let gana = 0;
+
+  for (const mano of posiblesCartasJugador) {
+    for (const carta of mano) {
+      total++;
+      if (carta.fuerza > cartaBot.fuerza) {
+        gana++;
+      }
+    }
+  }
+  return gana / total;
+}
+
+
+function botShouldTruco() {
+  // El bot elige su mejor carta
+  const mejorCartaBot = manoBot.slice().sort((a, b) => b.fuerza - a.fuerza)[0];
+
+  // Probabilidad de que el jugador tenga algo más fuerte
+  const probJugadorFuerte = probJugadorGanaContra(mejorCartaBot);
+
+  console.log("Prob jugador supera mi mejor carta:", probJugadorFuerte);
+
+  // Lógica inteligente:
+  //  
+  // - Si la probabilidad es MUY baja => cantar Truco
+  // - Si es media => Truco solo si el bot es mano
+  // - Si es alta => NO cantar Truco
+  
+  if (probJugadorFuerte < 0.25) {
+    return true; // tengo cartas FUERTES y el jugador rara vez gana
+  }
+
+  if (probJugadorFuerte < 0.40 && !empiezaJugador) {
+    return true; // arranco yo, puedo presionar
+  }
+
+  return false;
 }
 
 
@@ -356,38 +401,6 @@ function irseAlMazo() {
   setTimeout(repartir,600);
 }
 
-
- function botIntentarCantarTruco() {
-  if (trucoNivel >= 0 || rondaTerminada) return false;
-
-  const fuerzaBot = manoBot.reduce((acc, c) => acc + c.fuerza, 0);
-
-  if (fuerzaBot >= 23) {
-    if (timeoutEnvido) {
-      clearTimeout(timeoutEnvido);
-      timeoutEnvido = null;
-  }  
-  trucoNivel = 0;
-  quienCantoTruco = "bot";
-  log("Bot canta TRUCO");
-  mostrarAvisoCanto("¡TRUCO!");
-
-
-  safeDisable("btnTruco", true);
-  safeDisable("btnEnvido", true);
-  safeDisable("btnRealEnvido", true);
-  safeDisable("btnFaltaEnvido", true);
-
-  btnQuiero.style.display = "inline-block";
-  btnNoQuiero.style.display = "inline-block";
-
-  btnQuiero.onclick = () => responderTruco(true);
-  btnNoQuiero.onclick = () => responderTruco(false);
-
-  return true;
-}
-  return false;
-}
 
 
 function responderTruco(quiero) {
