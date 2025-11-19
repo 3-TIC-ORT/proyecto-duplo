@@ -117,6 +117,7 @@ function repartir(){
   playedBot = null;
   bazasJugador = 0;
   bazasBot = 0;
+  posiblesCartasJugador = [];
 
   safeDisable("btnTruco", false);
   safeDisable("btnRetruco",false);
@@ -241,6 +242,14 @@ function chooseBotCardWhenStarting() {
 
 
 function botRespondToPlayer(cartaJugador) {
+  let cartasPosibles = null;
+
+if (posiblesCartasJugador.length < 10) {
+  cartasPosibles = getCartasPosiblesJugador();
+  console.log("Deducción colapsada a cartas:");
+  console.table(cartasPosibles);
+}
+
   if (!esperandoRespuestaEnvido && !playedBot && botIntentarCantarTruco()) {
     return;}
   if (rondaTerminada) return;
@@ -260,6 +269,20 @@ function botRespondToPlayer(cartaJugador) {
         : manoBot.reduce((a,b) => a.fuerza > b.fuerza ? a : b);
     }
   }
+  if (cartasPosibles) {
+  const probabilidadGanar = cartasPosibles.filter(c => c.fuerza < cartaJugador.fuerza).length / cartasPosibles.length;
+
+  console.log("Probabilidad de que tu carta sea más débil:", probabilidadGanar);
+
+  let mejores = manoBot.filter(c => c.fuerza > cartaJugador.fuerza);
+
+  if (probabilidadGanar > 0.5 && mejores.length > 0) {
+    choice = mejores.reduce((a,b) => a.fuerza < b.fuerza ? a : b);
+  } else {
+  
+    choice = manoBot.reduce((a,b) => a.fuerza < b.fuerza ? a : b);
+  }
+}
   manoBot.splice(manoBot.indexOf(choice),1);
   playedBot = choice;
   cartasJugadas.push(choice);
@@ -268,6 +291,51 @@ function botRespondToPlayer(cartaJugador) {
   mostrarCartasEnMesa("bot", choice);
   resolveBaza();
   renderCartas();
+}
+
+
+function getCartasPosiblesJugador() {
+  if (!posiblesCartasJugador || posiblesCartasJugador.length === 0) return [];
+
+  let cartas = [];
+
+  posiblesCartasJugador.forEach(mano => {
+    mano.forEach(carta => {
+      if (!cartas.some(c => c.numero === carta.numero && c.palo === carta.palo)) {
+        cartas.push({
+          numero: carta.numero,
+          palo: carta.palo,
+          fuerza: carta.fuerza
+        });
+      }
+    });
+  });
+
+  return cartas;
+}
+
+
+
+function generarTodasLasManosPosibles(mazoCompleto, cartasVistas) {
+  const mazoFiltrado = mazoCompleto.filter(c =>
+    !cartasVistas.some(v => v.numero === c.numero && v.palo === c.palo)
+  );
+
+  let posibles = [];
+
+  for (let i = 0; i < mazoFiltrado.length; i++) {
+    for (let j = i + 1; j < mazoFiltrado.length; j++) {
+      for (let k = j + 1; k < mazoFiltrado.length; k++) {
+        posibles.push([
+          mazoFiltrado[i],
+          mazoFiltrado[j],
+          mazoFiltrado[k]
+        ]);
+      }
+    }
+  }
+
+  return posibles;
 }
 
 
@@ -418,6 +486,9 @@ function responderTruco(quiero) {
       }
     }, 200);
   }
+  if (!playedBot && !rondaTerminada) {
+    setTimeout(() => botRespondToPlayer(playedPlayer), 300);
+}
   quienCantoTruco = null;
 }
 
@@ -457,7 +528,6 @@ function cantarValecuatro() {
 
   decidirRespuestaTruco(4, 3);
 }
-
 
 function decidirRespuestaTruco(puntosSiQuiere, puntosSiNoQuiere) {
   const fuerzaBot = manoBot.reduce((acc, c) => acc + c.fuerza, 0);
@@ -586,7 +656,7 @@ function actualizarPosiblesManos(cartaTirada) {
   console.log("Manos posibles ANTES:", posiblesCartasJugador ? posiblesCartasJugador.length : 0);
 
   if (!posiblesCartasJugador || posiblesCartasJugador.length === 0) {
-    console.log("No había manos posibles para filtrar. (posiblesCartasJugador vacío)");
+    console.warn("NO HAY ENVIDO NO HAY LOG");
     return;
   }
 
@@ -597,13 +667,14 @@ function actualizarPosiblesManos(cartaTirada) {
     if (!contieneCarta) return false;
 
     const envidoMano = calcularEnvido(mano);
-    if (envidoJugadorDeclarado == null) {
-      return true;
-    }
+
+    if (envidoJugadorDeclarado == null) return true;
+
     return envidoMano === envidoJugadorDeclarado;
   });
 
   console.log("Manos posibles DESPUÉS:", posiblesCartasJugador.length);
+
   if (posiblesCartasJugador.length > 0) {
     posiblesCartasJugador.forEach((mano, i) => {
       console.log(
@@ -613,6 +684,13 @@ function actualizarPosiblesManos(cartaTirada) {
     });
   } else {
     console.warn("NO HAY ENVIDO NO HAY LOG");
+  }
+
+  if (posiblesCartasJugador.length <= 10) {
+    cartasPosibles = getCartasPosiblesJugador();
+    console.log("Cartas posibles colapsadas:", cartasPosibles);
+  } else {
+    cartasPosibles = null;
   }
 }
 
@@ -726,11 +804,7 @@ function responderEnvido(quiere) {
   }
   return;
 }
-posiblesCartasJugador = posiblesManosConEnvido(
-  eJ,
-  manoBot,
-  cartasJugadas
-);
+posiblesCartasJugador = posiblesManosConEnvido(eJ, manoBot, cartasJugadas);
 
 console.log("Posibles manos:", posiblesCartasJugador.length);
 posiblesCartasJugador.forEach((mano, i) => {
