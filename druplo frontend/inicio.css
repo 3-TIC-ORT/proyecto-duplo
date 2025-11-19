@@ -54,15 +54,28 @@ h2 {
 h3 {
     font-size: 4vw;
     margin-top: 0;
+    background-color: #000000;
+    color: white;
+    height: 85px;
+    width: 500px;
+    position: center;
 }
-
+.p{
+    font-size: 4vw;
+    margin-top: 0;
+    background-color: #000000;
+    color: white;
+    height: 85px;
+    width: 500px;
+    position: center;
+}
 #overlay {
     display: none;
     position: fixed;
     width: 20%;
     height: 20%;
     top: 0px;
-    left: 510px;    
+    left: 415px;    
     z-index: 1001;
     border-radius: 10px;
 }
@@ -81,11 +94,12 @@ h3 {
 
 #modalConfiguracion {
     position: center;
-    width: 100%;
-    background-color: #ffff00;
+    width: 500px;
+    height: 500px;
+    background-color: #8b8b8b;
     padding: 2em;
-    border-radius: 100px;
-    color: #0000ff;
+    border-radius: 2rem;
+    color: #000000;
     z-index: 1001;
     
 }
@@ -95,9 +109,9 @@ h3 {
     background-color: #ffff00;
     padding: 2em;
     color: #0000ff;
-    z-index: 1001;
-    
+    z-index: 1001;   
 }
+
 .clolseModal{
     width: 75px;
     height: 75px;
@@ -200,7 +214,6 @@ h3 {
     border-radius: 10px;
   }
   
-  /* --- Capa gris encima de las cartas bloqueadas --- */
   .carta.bloqueada::after {
     content: "🔒";
     position: absolute;
