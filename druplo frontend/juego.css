@@ -179,6 +179,8 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
   border: 2px solid rgba(0,60,0,0.6);
   height: 630px; 
   position: relative;
+  display: none;
+
 }
 
 .scoreboard h3, .log-box h3 { margin-bottom: 8px; }
