@@ -19,9 +19,15 @@
 
     
     <div class="area-principal">
+
+    
+      <header class="top-row">
+        <div class="titulo-left"><h2>Cartas del Bot</h2></div>
+        <div class="titulo-right"><h2>Tus cartas</h2></div>
+      </header>
+
       
       <div class="manos-row">
-        <img id="bot" src="../TIMI/bot.png">
         <div id="cartasBot" class="manos manos-bot"></div>
         <div id="tusCartas" class="manos manos-jugador"></div>
       </div>
@@ -45,11 +51,24 @@
         <button id="btnEnvido" onclick="cantarEnvido()">ENVIDO</button>
         <button id="btnRealEnvido" onclick="cantarRealEnvido()">REAL ENVIDO</button>
         <button id="btnFaltaEnvido" onclick="cantarFaltaEnvido()">FALTA ENVIDO</button>
+        <button id="btnMazo" onclick="irseAlMazo()">Irse al mazo</button>
         <button id="btnQuiero" onclick="responderEnvido(true)" style="display:none">QUIERO</button>
         <button id="btnNoQuiero" onclick="responderEnvido(false)" style="display:none">NO QUIERO</button>
-        <button id="btnMazo" onclick="irseAlMazo()">MAZO</button>
       </div>
     </div>
+
+    
+    <aside class="sidebar">
+      <div class="scoreboard">
+        <h3>Puntaje</h3>
+        <p>Vos: <span id="puntosJugador">0</span></p>
+        <p>Bot: <span id="puntosBot">0</span></p>
+      </div>
+      <div class="log-box">
+        <h3>Log del juego</h3>
+        <div id="log"></div>
+      </div>
+    </aside>
 
   </div>
 
@@ -57,7 +76,5 @@
   <script src="juego.js"></script>
 
   <div id="avisoCanto" class="aviso-canto"></div>
-
-  <div id="avisoResultado" class="aviso-resultado"></div>
 </body>
 </html>
