@@ -77,16 +77,24 @@ function crearMazo(){
 
 function crearMazoCompleto() {
   mazoCompleto = [];
+
+  const fuerzasAgregadas = new Set();
+
   for (const p of palos) {
     for (const n of numeros) {
-      mazoCompleto.push({
-        numero: n,
-        palo: p,
-        fuerza: fuerza[`${n}${p}`] || fuerza[n] || 0
-      });
+      const f = fuerza[`${n}${p}`] || fuerza[n] || 0;
+      if (!fuerzasAgregadas.has(f)) {
+        mazoCompleto.push({
+          numero: n,
+          palo: p,
+          fuerza: f
+        });
+        fuerzasAgregadas.add(f);
+      }
     }
   }
 }
+
 
 
 function sacarCarta(){
@@ -131,6 +139,15 @@ function repartir(){
   limpiarMesa();
   log(`Nueva mano. ${empiezaJugador ? "Vos sos mano" : "Bot es mano"}.`);
   if(!empiezaJugador) setTimeout(botPlayFirst, 700);
+}
+
+
+function obtenerCartasPosiblesJugador() {
+  const cartasPosibles = mazoCompleto.filter(c =>
+    !estaEn(manoBot, c) &&
+    !estaEn(cartasJugadas, c)
+  );
+  return cartasPosibles;
 }
 
 
@@ -215,10 +232,10 @@ function botPlayFirst() {
           return;
       }
   }
-
-  if (!esperandoRespuestaEnvido && !playedBot && botIntentarCantarTruco()) {
+  if (trucoNivel >= 0 && botShouldTruco()) {
+    botCantaTruco();
     return;
-  }
+}
 
   const cartaBot = chooseBotCardWhenStarting();
   manoBot.splice(manoBot.indexOf(cartaBot), 1);
@@ -315,7 +332,7 @@ function getCartasPosiblesJugador() {
 }
 
 
-
+// son las 1:45 no se si esto va aca y no pienso fijarme
 function generarTodasLasManosPosibles(mazoCompleto, cartasVistas) {
   const mazoFiltrado = mazoCompleto.filter(c =>
     !cartasVistas.some(v => v.numero === c.numero && v.palo === c.palo)
@@ -389,31 +406,48 @@ siguiente = empiezaJugador ? "player" : "bot";
   if (!turnoJugador) setTimeout(botPlayFirst, 600);
 }
 
-
 function finishHandByBazas(){
-  rondaTerminada = true;
-  let pts = 1;
-  if(trucoNivel === 0) pts = 1;
-  else if(trucoNivel === 1) pts = 2;
-  else if(trucoNivel === 2) pts = 3;
-  else if (trucoNivel === 3) pts = 4;
+    rondaTerminada = true;
+    let pts = 1;
+    if(trucoNivel === 0) pts = 1;
+    else if(trucoNivel === 1) pts = 2;
+    else if(trucoNivel === 2) pts = 3;
+    else if (trucoNivel === 3) pts = 4;
+    
+    let mensaje = ""; // Variable para guardar el mensaje del aviso
+    let ganoJugador = false; // Variable para saber si ganó el jugador
 
-  if(bazasJugador > bazasBot){
-    puntosJugador += pts;
-    log(`Ganaste la mano (+${pts})`);
-    empiezaJugador = true;
-  } else if(bazasBot > bazasJugador){
-    puntosBot += pts;
-    log(`Bot gana la mano (+${pts})`);
-    empiezaJugador = false;
-  } else {
-    if(empiezaJugador){ puntosJugador += pts; log(`Empate: gana quien es mano (Vos) (+${pts})`); }
-    else { puntosBot += pts; log(`Empate: gana quien es mano (Bot) (+${pts})`); }
-  }
-  actualizarPuntos();
-  setTimeout(repartir, 1200);
+    if(bazasJugador > bazasBot){
+        puntosJugador += pts;
+        mensaje = `GANASTE LA MANO`;
+        ganoJugador = true;
+        log(mensaje);
+        empiezaJugador = true;
+    } else if(bazasBot > bazasJugador){
+        puntosBot += pts;
+        mensaje = `PERDISTE LA MANO`;
+        ganoJugador = false;
+        log(mensaje);
+        empiezaJugador = false;
+    } else {
+        if(empiezaJugador){
+            puntosJugador += pts;
+            mensaje = `Empate: gana quien es mano (Vos) (+${pts})`;
+            ganoJugador = true;
+        } else {
+            puntosBot += pts;
+            mensaje = `Empate: gana quien es mano (Bot) (+${pts})`;
+            ganoJugador = false;
+        }
+        log(mensaje);
+    }
+    
+    // 💡 AGREGAR ESTA LÍNEA AQUÍ
+    mostrarAvisoResultado(mensaje.split(":")[0].replace(" (+", " (") , ganoJugador); 
+    
+    actualizarPuntos();
+    setTimeout(repartir, 1200);
 }
-
 
 function irseAlMazo() {
   let puntos = 1;
@@ -424,38 +458,6 @@ function irseAlMazo() {
   setTimeout(repartir,600);
 }
 
-
- function botIntentarCantarTruco() {
-  if (trucoNivel >= 0 || rondaTerminada) return false;
-
-  const fuerzaBot = manoBot.reduce((acc, c) => acc + c.fuerza, 0);
-
-  if (fuerzaBot >= 23) {
-    if (timeoutEnvido) {
-      clearTimeout(timeoutEnvido);
-      timeoutEnvido = null;
-  }  
-  trucoNivel = 0;
-  quienCantoTruco = "bot";
-  log("Bot canta TRUCO");
-  mostrarAvisoCanto("¡TRUCO!");
-
-
-  safeDisable("btnTruco", true);
-  safeDisable("btnEnvido", true);
-  safeDisable("btnRealEnvido", true);
-  safeDisable("btnFaltaEnvido", true);
-
-  btnQuiero.style.display = "inline-block";
-  btnNoQuiero.style.display = "inline-block";
-
-  btnQuiero.onclick = () => responderTruco(true);
-  btnNoQuiero.onclick = () => responderTruco(false);
-
-  return true;
-}
-  return false;
-}
 
 
 function responderTruco(quiero) {
@@ -804,16 +806,11 @@ function responderEnvido(quiere) {
   }
   return;
 }
+
 posiblesCartasJugador = posiblesManosConEnvido(eJ, manoBot, cartasJugadas);
 
-console.log("Posibles manos:", posiblesCartasJugador.length);
-posiblesCartasJugador.forEach((mano, i) => {
-  console.log(
-    `Mano ${i + 1}: ${mano[0].numero} de ${mano[0].palo}, ` +
-    `${mano[1].numero} de ${mano[1].palo}, ` +
-    `${mano[2].numero} de ${mano[2].palo}`
-  );
-});
+console.log("Cartas posibles del jugador:");
+posiblesCartasJugador.forEach(c => console.log(`${c.numero} de ${c.palo}`));
 
   if (eJ > eB) {
     puntosJugador += envidoAcumulado;
@@ -864,12 +861,17 @@ function continuarDespuesDeEnvido() {
   }
 }
 
-
 function actualizarPuntos(){
   document.getElementById("puntosJugador").textContent = puntosJugador;
   document.getElementById("puntosBot").textContent = puntosBot;
-}
 
+  if (puntosJugador >= 15) {
+    setTimeout(() => mostrarPopupFinal("jugador"), 50);
+  }
+  if (puntosBot >= 15) {
+    setTimeout(() => mostrarPopupFinal("bot"), 50);
+  }
+}
 
 function log(txt){
   const d = document.getElementById("log");
@@ -948,7 +950,6 @@ function cerrarOverlay() {
 mostrarOverlayGanaste()
 mostrarOverlayPerdiste()
 
-document.addEventListener("DOMContentLoaded", repartir);
 
 function mostrarAvisoCanto(texto) {
   const div = document.getElementById("avisoCanto"); // o avisoCanto si renombraste
@@ -959,3 +960,20 @@ function mostrarAvisoCanto(texto) {
     div.style.display = "none";
   }, 2000);
 }
+
+function mostrarAvisoResultado(texto, gano) {
+  const div = document.getElementById("avisoResultado");
+
+  div.textContent = texto;
+
+  // cambia color según si ganó o perdió
+  div.className = "aviso-resultado " + (gano ? "ganado" : "perdido");
+
+  div.style.display = "block";
+
+  setTimeout(() => {
+    div.style.display = "none";
+  }, 2000);
+}
+
+document.addEventListener("DOMContentLoaded", repartir);

@@ -79,7 +79,7 @@ body {
 }
 
 #mesa-center.mesa-center {
-  position: absolute;
+  position: relative;
   top: 50%;
   height: 250px;
 }
@@ -93,9 +93,19 @@ body {
 }
 
 
-.manos-bot { width: 45%; justify-content: flex-start; padding-left: 40px; }
+.manos-bot {
+  display: flex;
+  justify-content: flex-end; /* alinea a la derecha */
+  gap: 10px;
+  width: 45%; /* ya lo tienes */
+  padding-left: 0; /* elimina padding si quieres precisión */
+  transform: translateX(-300px);
+}
 .manos-jugador { width: 45%; justify-content: flex-end; padding-right: 40px; }
 
+#bot {
+  height: 126px;
+}
 
 .carta {
   width: 84px;
@@ -134,7 +144,7 @@ body {
 .botonera {
   position: absolute;
   bottom: 0;
-  width: 100%;
+  width: 90%;
   display: flex;
   justify-content: center;
   gap: 14px;
@@ -145,7 +155,8 @@ body {
   font-family: 'jsMath-cmbx10', sans-serif;
   background: #AE3C15;
   color: white;
-  border: none;
+  border: 1px solid black;
+  text-shadow: 0 0 4px #000000;
   padding: 10px 16px;
   border-radius: 8px;
   cursor: pointer;
@@ -155,6 +166,9 @@ body {
 .botonera button:active { transform: translateY(2px); }
 button:disabled { opacity: 0.5; cursor: not-allowed; }
 
+#btnMazo {
+  background: #11110D;
+}
 
 .sidebar {
   width: 300px;
@@ -221,15 +235,16 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
   right: 45%;
   top: 15%;
   transform: translate(150px, calc(var(--offset, 0px))) rotate(6deg);
+  
 }
 
 .carta-bot {
-  left: 45%;
+  position: absolute;
+  left: 70%;
   top: 25%;
-  transform: translate(-150px, calc(var(--offset, 0px))) rotate(-6deg);
+  transform: translateX(-500px);
 }
 
-/* Overlay general */
 .overlay {
   position: fixed;
   top: 0;
@@ -243,7 +258,6 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
   z-index: 9999;
 }
 
-/* Cuadro central */
 .overlay-content {
   background: white;
   padding: 25px 35px;
@@ -254,19 +268,41 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
 }
 
 .aviso-canto {
-  position: absolute;       /* NO mueve nada, solo flota */
-  top: 20px;                /* <-- Cambiá esto a donde quieras */
-  right: 20px;              /* <-- Cambiá esto también si querés */
-  background: #ffe600;
+  position: absolute;
+  top: 250px;
+  left: 20px; /*CHE NO TOQUEN ESTO ESTUVO RE TRUCO TRUCADO DE HACER*/
   padding: 12px 18px;
   border-radius: 8px;
-  font-size: 20px;
+  font-size: 100px;
   font-weight: bold;
-  color: black;
-  border: 2px solid #000;
-  box-shadow: 0 0 8px #0004;
-  display: none;            /* Oculto por defecto */
-  z-index: 9999;            /* Siempre arriba, sin tapar botones */
-  pointer-events: none;     /* No interfiere con clics */
+  color: white;
+  display: none;
+  z-index: 9999; 
+  pointer-events: none;
 }
 
+.aviso-resultado {
+    position: fixed; /* O absolute, dependiendo del contenedor */
+    top: 50%;
+    left: 50%;
+    height: 100%;
+    width: 100%;
+    transform: translate(-50%, -50%);
+    padding: 15px 30px;
+    border-radius: 8px;
+    font-size: 200px;
+    font-weight: bold;
+    z-index: 1000;
+    display: none; /* Inicialmente oculto */
+    text-align: center;
+}
+
+.ganado {
+    background-color: #00000093;
+    color: white;
+}
+
+.perdido {
+    background-color: #330300a1; /* Rojo */
+    color: white;
+}
