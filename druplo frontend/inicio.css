@@ -96,18 +96,69 @@ h3 {
     position: center;
     width: 500px;
     height: 500px;
-    background-color: #8b8b8b;
+    background-color: #BBBBBB;
     padding: 2em;
     border-radius: 2rem;
     color: #000000;
     z-index: 1001;
-    
+}
+.volumenGeneral{
+font-weight: 700;
+font-style: cmbx10;
+font-size: 30px;
+leading-trim: NONE;
+line-height: 100%;
+letter-spacing: 0%;
+angle: 0 deg;
+opacity: 1;
+font-weight: bold;
+display: flex;
+align-items: center;
+justify-content: center;
+}
+.VolumenMusica{
+    font-weight: 700;
+font-style: cmbx10;
+font-size: 30px;
+leading-trim: NONE;
+line-height: 100%;
+letter-spacing: 0%;
+angle: 0 deg;
+opacity: 1;
+font-weight: bold;
+display: flex;
+align-items: center;
+justify-content: center;
+width: auto;
+height: auto;
+}
+.VolumenEfects{
+    font-weight: 700;
+    font-style: cmbx10;
+    font-size: 30px;
+    leading-trim: NONE;
+    line-height: 100%;
+    letter-spacing: 0%;
+    angle: 0 deg;
+    opacity: 1;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: auto;
+    height: auto;
+}
+.volumen{
+width: 390px;
+height: 56px;
+opacity: 1;
+
 }
 #modalColeccion{
     position: center;
     width: 100%;
     background-color: #ffff00;
-    padding: 2em;
+
     color: #0000ff;
     z-index: 1001;   
 }
