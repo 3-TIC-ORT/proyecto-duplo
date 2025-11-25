@@ -95,7 +95,7 @@ h3 {
 #modalConfiguracion {
     position: center;
     width: 500px;
-    height: 500px;
+    height: 550px;
     background-color: #BBBBBB;
     padding: 2em;
     border-radius: 2rem;
@@ -150,15 +150,14 @@ height: auto;
 }
 .volumen{
 width: 390px;
-height: 56px;
 opacity: 1;
-
+color:#FF4545;
 }
 #modalColeccion{
     position: center;
     width: 100%;
     background-color: #ffff00;
-
+    padding: 2em;
     color: #0000ff;
     z-index: 1001;   
 }
