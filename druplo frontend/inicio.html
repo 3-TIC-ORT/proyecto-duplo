@@ -4,6 +4,10 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>DRUPLO</title>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/latin-modern-roman/index.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/latin-modern-sans/index.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/latin-modern-math/index.css">
+
         <link rel="stylesheet" type="text/css" href="inicio.css">
     </head>
     <body>
@@ -28,21 +32,16 @@
             <div id="modalConfiguracion">
                 <h3>Opciones</h3>
                 <div class="slidecontainer">
-                    <p>Volumen General</p>
+                    <p class="volumenGeneral">Volumen General</p>
                     <input type="range" min="0" max="100" value="100" class="volumen" id="volumenGeneral">
                 </div>
                 <div class="slidecontainer">
-                    <p>Volumen Musica</p>
+                    <p class="VolumenMusica">Volumen Musica</p>
                     <input type="range" min="0" max="100" value="100" class="volumen" id="volumenMusica">
                 </div>
                 <div class="slidecontainer">
-                    <p>Volumen Efectos de Sonido</p>
+                    <p class="VolumenEfects">Volumen Efectos de Sonido</p>
                     <input type="range" min="0" max="100" value="100" class="volumen" id="myRange">
-                </div>
-                <p>Velocidad</p>
-                <div class="slidecontainer">
-                    <input type="range" min="0.5" max="2" value="60" class="slider" id="myRange" step="0.5">
-                  </div>
                 <button class="clolseModal" id="closeOptionsModal">X</button>
             </div>
         </div>
