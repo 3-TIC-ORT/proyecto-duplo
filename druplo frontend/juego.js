@@ -41,6 +41,9 @@ let bazasBot = 0;
 let playedPlayer = null;
 let playedBot = null;
 
+let Gigantismo = false;
+let Druplo = true;
+
 
 function valorEnvido(carta){
   return carta && carta.numero >=1 && carta.numero <=7 ? carta.numero : 0;
@@ -246,39 +249,30 @@ function botRespondToPlayer(cartaJugador) {
 
 
 function botIntentarCantarTruco() {
-  // No canta si el truco ya fue cantado o la ronda terminó
   if (trucoNivel >= 0 || rondaTerminada) return false;
 
-  // Calcula la "fuerza" total de la mano del bot
   const fuerzaBot = manoBot.reduce((acc, carta) => acc + carta.fuerza, 0);
 
-  // Si la fuerza es suficiente, el bot canta Truco
   if (fuerzaBot >= 23) {
-    // Cancela cualquier timeout pendiente de Envido
     if (timeoutEnvido) {
       clearTimeout(timeoutEnvido);
       timeoutEnvido = null;
     }
 
-    // Actualiza el estado del truco
-    trucoNivel = 0;
+    trucoNivel = 1;
     quienCantoTruco = "bot";
 
-    // Loguea y muestra aviso
     log("Bot canta TRUCO");
     mostrarAvisoCanto("¡TRUCO!");
 
-    // Deshabilita botones de Envido y Truco
     safeDisable("btnTruco", true);
     safeDisable("btnEnvido", true);
     safeDisable("btnRealEnvido", true);
     safeDisable("btnFaltaEnvido", true);
 
-    // Muestra botones de respuesta para el jugador
     btnQuiero.style.display = "inline-block";
     btnNoQuiero.style.display = "inline-block";
 
-    // Asigna funciones a los botones
     btnQuiero.onclick = () => responderTruco(true);
     btnNoQuiero.onclick = () => responderTruco(false);
 
@@ -790,6 +784,19 @@ function mostrarAvisoCanto(texto) {
   setTimeout(() => {
     div.style.display = "none";
   }, 2000);
+}
+
+
+function GigantismoTrue(puntos, tipoEnvido) {
+  if (!Gigantismo) return puntos;
+  return puntos + 1;
+}
+
+function DruploTrue(ganoElJugador) {
+  if (!Druplo) return;
+
+  if (ganoElJugador) 
+    puntosJugador += 1;
 }
 
 
