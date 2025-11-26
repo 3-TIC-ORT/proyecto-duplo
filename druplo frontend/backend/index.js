@@ -2,7 +2,7 @@ import { subscribeGETEvent, subscribePOSTEvent, realTimeEvent, startServer } fro
 import fs from 'fs'
 import database from "mime-db";
  let usuarios = JSON.parse(fs.readFileSync("usuarios.json", "utf-8"))
- let logueado = 0
+ let logueado = false;
  function InicioSesion()
  {
      for (var i=0; i<usuarios.length; i++)
