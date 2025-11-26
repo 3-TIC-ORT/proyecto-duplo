@@ -41,9 +41,11 @@ let bazasBot = 0;
 let playedPlayer = null;
 let playedBot = null;
 
+// JOKERS
 let Gigantismo = false;
-let Druplo = true;
-
+let Druplo = false;
+let jockerDefensa = false;
+let jockerRiesgoso = false;
 
 function valorEnvido(carta){
   return carta && carta.numero >=1 && carta.numero <=7 ? carta.numero : 0;
@@ -792,11 +794,36 @@ function GigantismoTrue(puntos, tipoEnvido) {
   return puntos + 1;
 }
 
+
 function DruploTrue(ganoElJugador) {
   if (!Druplo) return;
 
   if (ganoElJugador) 
     puntosJugador += 1;
+}
+
+
+function jockerDefensaTrue(puntosOriginales, tipoCanto) {
+  if (!jockerDefensa) return puntosOriginales;
+
+  if (tipoCanto === "envido" || tipoCanto === "truco") {
+    return puntosOriginales;
+  }
+
+  const puntosReducidos = puntosOriginales - 1;
+
+  return Math.max(0, puntosReducidos);
+}
+ 
+
+function jockerRiesgosoTrue(puntosJugadorEnvido, jugadorGano, puntosNormales) {
+  if (!jockerRiesgoso) return puntosNormales;
+
+  if (jugadorGano && puntosJugadorEnvido <= 25) {
+    return puntosNormales + 2;
+  }
+
+  return puntosNormales;
 }
 
 
