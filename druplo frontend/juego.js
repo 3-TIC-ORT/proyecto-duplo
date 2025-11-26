@@ -800,4 +800,4 @@ function DruploTrue(ganoElJugador) {
 }
 
 
-document.addEventListener("DOMContentLoaded", repartir);
+document.addEventListener("DOMContentLoaded", repartir); 
