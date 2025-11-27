@@ -102,6 +102,15 @@ h3 {
     color: #000000;
     z-index: 1001;
 }
+#modalColeccion{
+    position: center;
+    width: 100%;
+    background-color: #ffff00;
+    padding: 2em;
+    color: #0000ff;
+    z-index: 1001;   
+}
+
 .volumenGeneral{
 font-weight: 700;
 font-style: cmbx10;
@@ -152,14 +161,6 @@ height: auto;
 width: 390px;
 opacity: 1;
 color:#FF4545;
-}
-#modalColeccion{
-    position: center;
-    width: 100%;
-    background-color: #ffff00;
-    padding: 2em;
-    color: #0000ff;
-    z-index: 1001;   
 }
 
 .clolseModal{
