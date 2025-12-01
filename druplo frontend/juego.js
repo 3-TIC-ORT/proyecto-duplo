@@ -6,6 +6,7 @@ const fuerza = {
 };
 
 let mazo = [];
+let mazoJugador = [];
 let mazoCompleto = [];
 let manoJugador = [];
 let manoBot = [];
@@ -71,7 +72,6 @@ function calcularEnvido(mano) {
 }
 
 function crearMazo(){
-  mazo = [];
   for(const p of palos) for(const n of numeros) {
     mazo.push({numero:n,palo:p,fuerza:fuerza[`${n}${p}`] || fuerza[n] || 0});
   }
