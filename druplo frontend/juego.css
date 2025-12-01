@@ -24,10 +24,10 @@
   left: 0;
   top: 0;
   width: 1366px;
-  height: 624px;
+  height: 641px;
   background-color: #C8BCBC;
   background-image: url("../TIMI/inter.png");
-  background-size: 1366px 624px;
+  background-size: 1366px 641px;
   font-family: serif;
   display: none;
 }
@@ -42,10 +42,10 @@
   left: 0;
   top: 0;
   width: 1366px;
-  height: 624px;
+  height: 641px;
   background-color: #D9D9D9;
   background-image: url("../TIMI/inter.png");
-  background-size: 1366px 624px;
+  background-size: 1366px 641px;
   font-family: serif;
   display: none;
 }
@@ -103,7 +103,7 @@
 *{ box-sizing: border-box; margin: 0; padding: 0; }
 
 html,body {
-  max-height: 624px;
+  max-height: 641px;
   max-width: 1366px;
   font-family: serif;
 }
@@ -115,13 +115,18 @@ body {
   justify-content: center;
   align-items: flex-start;
   padding-top: 6px;
-  height: 624px;
+  height: 641px;       /* Forzar altura exacta */
+  width: 1366px;       /* Forzar ancho exacto */
+  max-height: 644px;
+  max-width: 1366px;
+  overflow: hidden;    /* Evita scrolls que cortan overlays */
+  font-family: serif;
 }
 
 
 .juego-wrapper {
   max-width: 1366px;
-  height: 624px;
+  height: 641px;
   width: var(--ancho-total);
   display: flex;
   gap: 18px;

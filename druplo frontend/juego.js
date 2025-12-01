@@ -1,3 +1,4 @@
+let cartasEspecialesFijas = null;
 const palos = ["espada","basto","oro","copa"];
 const numeros = [1,2,3,4,5,6,7,10,11,12];
 const fuerza = {
@@ -762,6 +763,27 @@ function generarTarotsAleatorios() {
   return Array.from(numeros);
 }
 
+function generarCartasEspecialesFijas() {
+  if (cartasEspecialesFijas !== null) return cartasEspecialesFijas; 
+
+  const todas = [];
+  for (const palo of palos) {
+    for (const numero of numeros) {
+      todas.push({ numero, palo });
+    }
+  }
+
+  // Mezclar
+  for (let i = todas.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [todas[i], todas[j]] = [todas[j], todas[i]];
+  }
+
+  // Elegir 8
+  cartasEspecialesFijas = todas.slice(0, 8);
+  return cartasEspecialesFijas;
+}
+
 function mostrarCartasTarot() {
   const container = document.getElementById("cartas-tarot");
   container.innerHTML = ""; // Limpiar contenedor
@@ -773,7 +795,14 @@ function mostrarCartasTarot() {
     img.src = `../TIMI/tarot_${numero}.png`;
     img.alt = `Tarot ${numero}`;
     img.className = "carta-tarot";
-    img.onclick = () => mostrarMenuCartasNormales();
+    img.onclick = () => {
+      const max = Math.max(...tarotsNumeros);
+      if (numero === max) {
+        mostrarMenuCartasEspeciales();
+      } else {
+        mostrarMenuCartasNormales();
+      }
+    };
     container.appendChild(img);
   });
 }
@@ -784,8 +813,13 @@ function mostrarMenuCartasNormales() {
     const container = document.body;
     const menu = document.createElement("div");
     menu.id = "menu-cartas-normales";
-    menu.style.cssText = "position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.9); padding: 20px; border-radius: 10px; z-index: 1000; max-height: 80vh; overflow-y: auto;";
-    
+    menu.style.cssText = `
+    position: fixed; top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    background: black;
+    padding: 20px; border-radius: 30px;
+    z-index: 1000; max-height: 80vh; overflow-y: auto;
+  `;
     const titulo = document.createElement("h2");
     titulo.textContent = "Todas las Cartas";
     titulo.style.color = "white";
@@ -797,7 +831,7 @@ function mostrarMenuCartasNormales() {
     for (const palo of palos) {
       for (const numero of numeros) {
         const cartaDiv = document.createElement("div");
-        cartaDiv.style.cssText = "cursor: pointer; border: 2px solid #ffd700; border-radius: 5px;";
+        cartaDiv.style.cssText = "cursor: pointer; border-radius: 5px;";
         
         const img = document.createElement("img");
         img.src = `../TIMI/${numero}_${palo}.png`;
@@ -817,12 +851,79 @@ function mostrarMenuCartasNormales() {
     
     const cerrarBtn = document.createElement("button");
     cerrarBtn.textContent = "Cerrar";
-    cerrarBtn.style.cssText = "margin-top: 20px; padding: 10px 20px; background: #ffd700; color: black; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;";
+    cerrarBtn.style.cssText = "margin-top: 20px; padding: 10px 20px; background-color: black; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;";
     cerrarBtn.onclick = () => menu.remove();
     menu.appendChild(cerrarBtn);
     
     container.appendChild(menu);
   }
+}
+
+function mostrarMenuCartasEspeciales() {
+  const menuExistente = document.getElementById("menu-cartas-especiales");
+  if (menuExistente) return; // NO rehacer si ya está hecho
+
+  const container = document.body;
+  
+  const menu = document.createElement("div");
+  menu.id = "menu-cartas-especiales";
+  menu.style.cssText = `
+    position: fixed; top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    background: black;
+    padding: 20px; border-radius: 30px;
+    z-index: 1000; max-height: 80vh; overflow-y: auto;
+  `;
+  const titulo = document.createElement("h2");
+  titulo.textContent = "Cartas Especiales";
+  titulo.style.color = "white";
+  menu.appendChild(titulo);
+
+  const grid = document.createElement("div");
+  grid.style.cssText = `
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+  `;
+
+  const cartas = generarCartasEspecialesFijas();
+
+  cartas.forEach(c => {
+    const div = document.createElement("div");
+    div.style.cssText = "cursor: pointer; border-radius: 5px;";
+
+    const img = document.createElement("img");
+    img.src = `../TIMI/${c.numero}_${c.palo}.png`;
+    img.style.cssText = "width: 100%; height: auto; border-radius: 5px;";
+    
+    div.appendChild(img);
+
+    div.onclick = () => {
+      menu.remove();
+      cerrarOverlay();
+    };
+
+    grid.appendChild(div);
+  });
+
+  menu.appendChild(grid);
+
+  const cerrarBtn = document.createElement("button");
+  cerrarBtn.textContent = "Cerrar";
+  cerrarBtn.style.cssText = `
+    margin-top: 20px;
+    padding: 10px 20px;
+    color: white;
+    background-color: black;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+  `;
+  cerrarBtn.onclick = () => menu.remove();
+
+  menu.appendChild(cerrarBtn);
+  container.appendChild(menu);
 }
 
 function mostrarOverlayGanaste() {
