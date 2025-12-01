@@ -38,7 +38,8 @@
                     <div class="slidecontainer">
                         <p class="VolumenEfects">Volumen Efectos de Sonido</p>
                         <input type="range" min="0" max="100" value="100" class="volumen" id="myRange">
-                    <button class="clolseModal" id="closeOptionsModal">X</button>
+                </div>
+                <button class="clolseModal" id="closeOptionsModal">X</button>
                 </div>
             </div>
             <div id="overlay2">
@@ -63,16 +64,14 @@
                 </div>
             </div>
             <script>
-                document.getElementById('openOptions').addEventListener('click', function(event) {
-                    event.preventDefault(); // Prevents navigating away
-                    document.getElementById('overlay').style.display = 'block';
-                });
-
                 document.getElementById('openCol').addEventListener('click', function(event) {
-                    event.preventDefault(); // Prevents navigating away
+                    event.preventDefault(); 
                     document.getElementById('overlay2').style.display = 'block';
                 });
-
+                document.getElementById('openOptions').addEventListener('click', function(event) {
+                    event.preventDefault(); 
+                    document.getElementById('overlay').style.display = 'block';
+                });
                 document.getElementById('closeOptionsModal').addEventListener('click', function() {
                     document.getElementById('overlay').style.display = 'none';
                 });
