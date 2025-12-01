@@ -703,25 +703,20 @@ function log(txt){
   d.scrollTop = d.scrollHeight;
 }
 
-
 function mostrarCartasEnMesa(origen, carta) {
   const mesaCenter = document.getElementById("mesa-center");
   if (!mesaCenter || !carta) return;
 
-  // Crear un div para la carta
   const nuevaCarta = document.createElement("div");
   nuevaCarta.classList.add("carta-mesa");
 
-  // Crear la imagen de la carta
   const img = document.createElement("img");
-  img.src = `../TIMI/${carta.numero}_${carta.palo}.png`;  // Ruta de la imagen
-  img.alt = `${carta.numero} de ${carta.palo}`;  // Texto alternativo para accesibilidad
-  img.className = "carta-imagen";  // Clase para la imagen
+  img.src = `../TIMI/${carta.numero}_${carta.palo}.png`;
+  img.alt = `${carta.numero} de ${carta.palo}`;
+  img.className = "carta-imagen";
 
-  // Agregar la imagen a la carta
   nuevaCarta.appendChild(img);
 
-  // Si la carta es del bot, ajusta el estilo para el bot
   if (origen === "bot") {
     nuevaCarta.classList.add("carta-bot");
     const offset = offsetBot * 10;
@@ -730,7 +725,6 @@ function mostrarCartasEnMesa(origen, carta) {
     mesaCenter.appendChild(nuevaCarta);
     offsetBot++;
   } else {
-    // Si la carta es del jugador, ajusta el estilo para el jugador
     nuevaCarta.classList.add("carta-jugador");
     const offset = offsetPlayer * 10;
     nuevaCarta.style.setProperty("--offset", `${offset}px`);
@@ -760,10 +754,9 @@ function verificarFinDelJuego() {
 function generarTarotsAleatorios() {
   const tarotsSeleccionados = [];
   const numeros = new Set();
-  
-  // Generar 5 números aleatorios del 1 al 13
+
   while (numeros.size < 5) {
-    numeros.add(Math.floor(Math.random() * 13) + 1);
+    numeros.add(Math.floor(Math.random() * 9) + 1);
   }
   
   return Array.from(numeros);
