@@ -265,8 +265,6 @@ function botIntentarCantarTruco() {
     quienCantoTruco = "bot";
 
     log("Bot canta TRUCO");
-    mostrarAvisoCanto("¡TRUCO!");
-
     safeDisable("btnTruco", true);
     safeDisable("btnEnvido", true);
     safeDisable("btnRealEnvido", true);
@@ -579,8 +577,6 @@ function botCantaEnvidoTipo() {
 
   log("Bot canta Envido");
 
-  mostrarAvisoCanto("¡ENVIDO!");
-
   mostrarBotonesEnvido();
 }
 
@@ -784,8 +780,56 @@ function mostrarCartasTarot() {
     img.src = `../TIMI/tarot_${numero}.png`;
     img.alt = `Tarot ${numero}`;
     img.className = "carta-tarot";
+    img.onclick = () => mostrarMenuCartasNormales();
     container.appendChild(img);
   });
+}
+
+function mostrarMenuCartasNormales() {
+  const menuCartas = document.getElementById("menu-cartas-normales");
+  if (!menuCartas) {
+    const container = document.body;
+    const menu = document.createElement("div");
+    menu.id = "menu-cartas-normales";
+    menu.style.cssText = "position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.9); padding: 20px; border-radius: 10px; z-index: 1000; max-height: 80vh; overflow-y: auto;";
+    
+    const titulo = document.createElement("h2");
+    titulo.textContent = "Todas las Cartas";
+    titulo.style.color = "white";
+    menu.appendChild(titulo);
+    
+    const gridCartas = document.createElement("div");
+    gridCartas.style.cssText = "display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px;";
+    
+    for (const palo of palos) {
+      for (const numero of numeros) {
+        const cartaDiv = document.createElement("div");
+        cartaDiv.style.cssText = "cursor: pointer; border: 2px solid #ffd700; border-radius: 5px;";
+        
+        const img = document.createElement("img");
+        img.src = `../TIMI/${numero}_${palo}.png`;
+        img.alt = `${numero} de ${palo}`;
+        img.style.cssText = "width: 100%; height: auto; border-radius: 5px;";
+        
+        cartaDiv.appendChild(img);
+        cartaDiv.onclick = () => {
+          menu.remove();
+          cerrarOverlay();
+        };
+        gridCartas.appendChild(cartaDiv);
+      }
+    }
+    
+    menu.appendChild(gridCartas);
+    
+    const cerrarBtn = document.createElement("button");
+    cerrarBtn.textContent = "Cerrar";
+    cerrarBtn.style.cssText = "margin-top: 20px; padding: 10px 20px; background: #ffd700; color: black; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;";
+    cerrarBtn.onclick = () => menu.remove();
+    menu.appendChild(cerrarBtn);
+    
+    container.appendChild(menu);
+  }
 }
 
 function mostrarOverlayGanaste() {
