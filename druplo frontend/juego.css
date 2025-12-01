@@ -50,6 +50,32 @@
   display: none;
 }
 
+.cartas-tarot-container {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin: 30px 0;
+  flex-wrap: wrap;
+}
+
+.carta-tarot {
+  width: 80px;
+  height: 120px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  transition: transform 0.2s ease;
+  cursor: pointer;
+}
+
+.carta-tarot:hover {
+  transform: scale(1.1) translateY(-5px);
+}
+
+.ganaste-subtitle {
+  font-size: 70px;
+  font-weight: normal;
+}
+
 #continuar {
   text-decoration: none;
   color: black;

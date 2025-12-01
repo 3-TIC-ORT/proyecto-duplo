@@ -761,7 +761,35 @@ function verificarFinDelJuego() {
   }
 }
 
+function generarTarotsAleatorios() {
+  const tarotsSeleccionados = [];
+  const numeros = new Set();
+  
+  // Generar 5 números aleatorios del 1 al 13
+  while (numeros.size < 5) {
+    numeros.add(Math.floor(Math.random() * 13) + 1);
+  }
+  
+  return Array.from(numeros);
+}
+
+function mostrarCartasTarot() {
+  const container = document.getElementById("cartas-tarot");
+  container.innerHTML = ""; // Limpiar contenedor
+  
+  const tarotsNumeros = generarTarotsAleatorios();
+  
+  tarotsNumeros.forEach(numero => {
+    const img = document.createElement("img");
+    img.src = `../TIMI/tarot_${numero}.png`;
+    img.alt = `Tarot ${numero}`;
+    img.className = "carta-tarot";
+    container.appendChild(img);
+  });
+}
+
 function mostrarOverlayGanaste() {
+  mostrarCartasTarot();
   document.getElementById("ganaste").style.display = "block";
 }
 
