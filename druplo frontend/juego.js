@@ -357,6 +357,7 @@ function finishHandByBazas(){
     else { puntosBot += pts; log(`Empate: gana quien es mano (Bot) (+${pts})`); }
   }
   actualizarPuntos();
+  verificarFinDelJuego();
   setTimeout(repartir, 1200);
 }
 
@@ -367,6 +368,7 @@ function irseAlMazo() {
   puntosBot += puntos;
   actualizarPuntos();
   log(`Te fuiste al mazo. Bot gana ${puntos} punto${puntos>1?"s":""}.`);
+  verificarFinDelJuego();
   setTimeout(repartir,600);
 }
 
@@ -751,31 +753,31 @@ function limpiarMesa(){
 }
 
 
-function mostrarOverlayGanaste() {
+function verificarFinDelJuego() {
   if (puntosJugador >= 15) {
-  document.getElementById("overlay-title").textContent = "¡Ganaste!";
-  document.getElementById("overlay-text").textContent = "Llegaste a 15 puntos.";
-  document.getElementById("overlay-text").textContent = puntosJugador + " a " + puntosBot;
-  document.getElementById("overlay").style.display = "flex";
+    mostrarOverlayGanaste();
+  } else if (puntosBot >= 15) {
+    mostrarOverlayPerdiste();
   }
 }
 
+function mostrarOverlayGanaste() {
+  document.getElementById("ganaste").style.display = "block";
+}
 
 function mostrarOverlayPerdiste() {
-  if (puntosBot >= 15) {
-  document.getElementById("overlay-title").textContent = "Perdiste";
-  document.getElementById("overlay-text").textContent = "El bot llegó a 15 puntos.";
-  document.getElementById("overlay-text").textContent = puntosJugador + " a " + puntosBot;
-  document.getElementById("overlay").style.display = "flex";
-  }
+  document.getElementById("perdiste").style.display = "block";
 }
 
 function cerrarOverlay() {
   document.getElementById("overlay").style.display = "none";
+  document.getElementById("perdiste").style.display = "none";
+  document.getElementById("ganaste").style.display = "none";
+  puntosJugador = 0;
+  puntosBot = 0;
+  actualizarPuntos();
+  repartir();
 }
-
-mostrarOverlayGanaste()
-mostrarOverlayPerdiste()
 
 
 function mostrarAvisoCanto(texto) {

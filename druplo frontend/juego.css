@@ -32,6 +32,24 @@
   display: none;
 }
 
+#ganaste {
+  padding-top: 80px;
+  color: black;
+  font-size: 75px;
+  text-align: center;
+  z-index: 67;
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1366px;
+  height: 624px;
+  background-color: #D9D9D9;
+  background-image: url("../TIMI/inter.png");
+  background-size: 1366px 624px;
+  font-family: serif;
+  display: none;
+}
+
 #continuar {
   text-decoration: none;
   color: black;
