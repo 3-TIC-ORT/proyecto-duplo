@@ -1,3 +1,4 @@
+let cartasEspecialesFijas = null;
 const palos = ["espada","basto","oro","copa"];
 const numeros = [1,2,3,4,5,6,7,10,11,12];
 const fuerza = {
@@ -6,12 +7,11 @@ const fuerza = {
 };
 
 let mazo = [];
+let mazoJugador = [];
 let mazoCompleto = [];
-crearMazoCompleto();
 let manoJugador = [];
 let manoBot = [];
 let cartasJugadas = [];
-let posiblesCartasJugador = [];
 let puntosJugador = 0;
 let puntosBot = 0;
 
@@ -43,6 +43,11 @@ let bazasBot = 0;
 let playedPlayer = null;
 let playedBot = null;
 
+// JOKERS
+let Gigantismo = false;
+let Druplo = false;
+let jockerDefensa = false;
+let jockerRiesgoso = false;
 
 function valorEnvido(carta){
   return carta && carta.numero >=1 && carta.numero <=7 ? carta.numero : 0;
@@ -68,47 +73,15 @@ function calcularEnvido(mano) {
 }
 
 function crearMazo(){
-  mazo = [];
   for(const p of palos) for(const n of numeros) {
     mazo.push({numero:n,palo:p,fuerza:fuerza[`${n}${p}`] || fuerza[n] || 0});
   }
 }
 
 
-function crearMazoCompleto() {
-  mazoCompleto = [];
-
-  const fuerzasAgregadas = new Set();
-
-  for (const p of palos) {
-    for (const n of numeros) {
-      const f = fuerza[`${n}${p}`] || fuerza[n] || 0;
-      if (!fuerzasAgregadas.has(f)) {
-        mazoCompleto.push({
-          numero: n,
-          palo: p,
-          fuerza: f
-        });
-        fuerzasAgregadas.add(f);
-      }
-    }
-  }
-}
-
-
-
 function sacarCarta(){
   const i = Math.floor(Math.random()*mazo.length);
   return mazo.splice(i,1)[0];
-}
-
-
-function cartasIguales(c1, c2) {
-  return c1.numero === c2.numero && c1.palo === c2.palo;
-}
-
-function estaEn(lista, carta) {
-  return lista.some(c => cartasIguales(c, carta));
 }
 
 
@@ -125,7 +98,6 @@ function repartir(){
   playedBot = null;
   bazasJugador = 0;
   bazasBot = 0;
-  posiblesCartasJugador = [];
 
   safeDisable("btnTruco", false);
   safeDisable("btnRetruco",false);
@@ -139,15 +111,6 @@ function repartir(){
   limpiarMesa();
   log(`Nueva mano. ${empiezaJugador ? "Vos sos mano" : "Bot es mano"}.`);
   if(!empiezaJugador) setTimeout(botPlayFirst, 700);
-}
-
-
-function obtenerCartasPosiblesJugador() {
-  const cartasPosibles = mazoCompleto.filter(c =>
-    !estaEn(manoBot, c) &&
-    !estaEn(cartasJugadas, c)
-  );
-  return cartasPosibles;
 }
 
 
@@ -203,7 +166,6 @@ function playerPlay(i){
   const carta = manoJugador.splice(i,1)[0];
 
   cartasJugadas.push(carta);
-  actualizarPosiblesManos(carta);
 
   playedPlayer = carta;
   log(`Jugaste ${carta.numero} de ${carta.palo}`);
@@ -232,7 +194,7 @@ function botPlayFirst() {
           return;
       }
   }
-  if (trucoNivel >= 0 && botShouldTruco()) {
+  if (trucoNivel >= 0 && botIntentarCantarTruco()) {
     botCantaTruco();
     return;
 }
@@ -259,14 +221,6 @@ function chooseBotCardWhenStarting() {
 
 
 function botRespondToPlayer(cartaJugador) {
-  let cartasPosibles = null;
-
-if (posiblesCartasJugador.length < 10) {
-  cartasPosibles = getCartasPosiblesJugador();
-  console.log("Deducción colapsada a cartas:");
-  console.table(cartasPosibles);
-}
-
   if (!esperandoRespuestaEnvido && !playedBot && botIntentarCantarTruco()) {
     return;}
   if (rondaTerminada) return;
@@ -286,20 +240,6 @@ if (posiblesCartasJugador.length < 10) {
         : manoBot.reduce((a,b) => a.fuerza > b.fuerza ? a : b);
     }
   }
-  if (cartasPosibles) {
-  const probabilidadGanar = cartasPosibles.filter(c => c.fuerza < cartaJugador.fuerza).length / cartasPosibles.length;
-
-  console.log("Probabilidad de que tu carta sea más débil:", probabilidadGanar);
-
-  let mejores = manoBot.filter(c => c.fuerza > cartaJugador.fuerza);
-
-  if (probabilidadGanar > 0.5 && mejores.length > 0) {
-    choice = mejores.reduce((a,b) => a.fuerza < b.fuerza ? a : b);
-  } else {
-  
-    choice = manoBot.reduce((a,b) => a.fuerza < b.fuerza ? a : b);
-  }
-}
   manoBot.splice(manoBot.indexOf(choice),1);
   playedBot = choice;
   cartasJugadas.push(choice);
@@ -311,48 +251,36 @@ if (posiblesCartasJugador.length < 10) {
 }
 
 
-function getCartasPosiblesJugador() {
-  if (!posiblesCartasJugador || posiblesCartasJugador.length === 0) return [];
+function botIntentarCantarTruco() {
+  if (trucoNivel >= 0 || rondaTerminada) return false;
 
-  let cartas = [];
+  const fuerzaBot = manoBot.reduce((acc, carta) => acc + carta.fuerza, 0);
 
-  posiblesCartasJugador.forEach(mano => {
-    mano.forEach(carta => {
-      if (!cartas.some(c => c.numero === carta.numero && c.palo === carta.palo)) {
-        cartas.push({
-          numero: carta.numero,
-          palo: carta.palo,
-          fuerza: carta.fuerza
-        });
-      }
-    });
-  });
-
-  return cartas;
-}
-
-
-// son las 1:45 no se si esto va aca y no pienso fijarme
-function generarTodasLasManosPosibles(mazoCompleto, cartasVistas) {
-  const mazoFiltrado = mazoCompleto.filter(c =>
-    !cartasVistas.some(v => v.numero === c.numero && v.palo === c.palo)
-  );
-
-  let posibles = [];
-
-  for (let i = 0; i < mazoFiltrado.length; i++) {
-    for (let j = i + 1; j < mazoFiltrado.length; j++) {
-      for (let k = j + 1; k < mazoFiltrado.length; k++) {
-        posibles.push([
-          mazoFiltrado[i],
-          mazoFiltrado[j],
-          mazoFiltrado[k]
-        ]);
-      }
+  if (fuerzaBot >= 23) {
+    if (timeoutEnvido) {
+      clearTimeout(timeoutEnvido);
+      timeoutEnvido = null;
     }
+
+    trucoNivel = 1;
+    quienCantoTruco = "bot";
+
+    log("Bot canta TRUCO");
+    safeDisable("btnTruco", true);
+    safeDisable("btnEnvido", true);
+    safeDisable("btnRealEnvido", true);
+    safeDisable("btnFaltaEnvido", true);
+
+    btnQuiero.style.display = "inline-block";
+    btnNoQuiero.style.display = "inline-block";
+
+    btnQuiero.onclick = () => responderTruco(true);
+    btnNoQuiero.onclick = () => responderTruco(false);
+
+    return true;
   }
 
-  return posibles;
+  return false;
 }
 
 
@@ -406,48 +334,32 @@ siguiente = empiezaJugador ? "player" : "bot";
   if (!turnoJugador) setTimeout(botPlayFirst, 600);
 }
 
-function finishHandByBazas(){
-    rondaTerminada = true;
-    let pts = 1;
-    if(trucoNivel === 0) pts = 1;
-    else if(trucoNivel === 1) pts = 2;
-    else if(trucoNivel === 2) pts = 3;
-    else if (trucoNivel === 3) pts = 4;
-    
-    let mensaje = ""; // Variable para guardar el mensaje del aviso
-    let ganoJugador = false; // Variable para saber si ganó el jugador
 
-    if(bazasJugador > bazasBot){
-        puntosJugador += pts;
-        mensaje = `GANASTE LA MANO`;
-        ganoJugador = true;
-        log(mensaje);
-        empiezaJugador = true;
-    } else if(bazasBot > bazasJugador){
-        puntosBot += pts;
-        mensaje = `PERDISTE LA MANO`;
-        ganoJugador = false;
-        log(mensaje);
-        empiezaJugador = false;
-    } else {
-        if(empiezaJugador){
-            puntosJugador += pts;
-            mensaje = `Empate: gana quien es mano (Vos) (+${pts})`;
-            ganoJugador = true;
-        } else {
-            puntosBot += pts;
-            mensaje = `Empate: gana quien es mano (Bot) (+${pts})`;
-            ganoJugador = false;
-        }
-        log(mensaje);
-    }
-    
-    // 💡 AGREGAR ESTA LÍNEA AQUÍ
-    mostrarAvisoResultado(mensaje.split(":")[0].replace(" (+", " (") , ganoJugador); 
-    
-    actualizarPuntos();
-    setTimeout(repartir, 1200);
+function finishHandByBazas(){
+  rondaTerminada = true;
+  let pts = 1;
+  if(trucoNivel === 0) pts = 1;
+  else if(trucoNivel === 1) pts = 2;
+  else if(trucoNivel === 2) pts = 3;
+  else if (trucoNivel === 3) pts = 4;
+
+  if(bazasJugador > bazasBot){
+    puntosJugador += pts;
+    log(`Ganaste la mano (+${pts})`);
+    empiezaJugador = true;
+  } else if(bazasBot > bazasJugador){
+    puntosBot += pts;
+    log(`Bot gana la mano (+${pts})`);
+    empiezaJugador = false;
+  } else {
+    if(empiezaJugador){ puntosJugador += pts; log(`Empate: gana quien es mano (Vos) (+${pts})`); }
+    else { puntosBot += pts; log(`Empate: gana quien es mano (Bot) (+${pts})`); }
+  }
+  actualizarPuntos();
+  verificarFinDelJuego();
+  setTimeout(repartir, 1200);
 }
+
 
 function irseAlMazo() {
   let puntos = 1;
@@ -455,6 +367,7 @@ function irseAlMazo() {
   puntosBot += puntos;
   actualizarPuntos();
   log(`Te fuiste al mazo. Bot gana ${puntos} punto${puntos>1?"s":""}.`);
+  verificarFinDelJuego();
   setTimeout(repartir,600);
 }
 
@@ -488,9 +401,6 @@ function responderTruco(quiero) {
       }
     }, 200);
   }
-  if (!playedBot && !rondaTerminada) {
-    setTimeout(() => botRespondToPlayer(playedPlayer), 300);
-}
   quienCantoTruco = null;
 }
 
@@ -530,6 +440,7 @@ function cantarValecuatro() {
 
   decidirRespuestaTruco(4, 3);
 }
+
 
 function decidirRespuestaTruco(puntosSiQuiere, puntosSiNoQuiere) {
   const fuerzaBot = manoBot.reduce((acc, c) => acc + c.fuerza, 0);
@@ -651,82 +562,6 @@ function decidirSiBotQuiere(tipo) {
 }
 
 
-function actualizarPosiblesManos(cartaTirada) {
-  console.log("=== FILTRANDO POSIBLES MANOS ===");
-  console.log("Carta tirada:", cartaTirada);
-  console.log("Envido declarado:", envidoJugadorDeclarado);
-  console.log("Manos posibles ANTES:", posiblesCartasJugador ? posiblesCartasJugador.length : 0);
-
-  if (!posiblesCartasJugador || posiblesCartasJugador.length === 0) {
-    console.warn("NO HAY ENVIDO NO HAY LOG");
-    return;
-  }
-
-  posiblesCartasJugador = posiblesCartasJugador.filter(mano => {
-    const contieneCarta = mano.some(c =>
-      c.numero === cartaTirada.numero && c.palo === cartaTirada.palo
-    );
-    if (!contieneCarta) return false;
-
-    const envidoMano = calcularEnvido(mano);
-
-    if (envidoJugadorDeclarado == null) return true;
-
-    return envidoMano === envidoJugadorDeclarado;
-  });
-
-  console.log("Manos posibles DESPUÉS:", posiblesCartasJugador.length);
-
-  if (posiblesCartasJugador.length > 0) {
-    posiblesCartasJugador.forEach((mano, i) => {
-      console.log(
-        `Mano ${i + 1}: ${mano[0].numero} de ${mano[0].palo}, ` +
-        `${mano[1].numero} de ${mano[1].palo}, ${mano[2].numero} de ${mano[2].palo}`
-      );
-    });
-  } else {
-    console.warn("NO HAY ENVIDO NO HAY LOG");
-  }
-
-  if (posiblesCartasJugador.length <= 10) {
-    cartasPosibles = getCartasPosiblesJugador();
-    console.log("Cartas posibles colapsadas:", cartasPosibles);
-  } else {
-    cartasPosibles = null;
-  }
-}
-
-
-function posiblesManosConEnvido(puntajeBuscado, cartasBot, cartasJugadas) {
-  const mazoFiltrado = mazoCompleto.filter(c =>
-    !estaEn(cartasBot, c) &&
-    !estaEn(cartasJugadas, c)
-  );
-
-  const posibles = [];
-
-  for (let i = 0; i < mazoFiltrado.length; i++) {
-    for (let j = i + 1; j < mazoFiltrado.length; j++) {
-
-      const c1 = mazoFiltrado[i];
-      const c2 = mazoFiltrado[j];
-      const compartenPalo = c1.palo === c2.palo;
-
-      if (!compartenPalo && puntajeBuscado > 20) continue;
-
-      for (let k = j + 1; k < mazoFiltrado.length; k++) {
-        const mano = [c1, c2, mazoFiltrado[k]];
-
-        if (calcularEnvido(mano) === puntajeBuscado) {
-          posibles.push(mano);
-        }
-      }
-    }
-  }
-  return posibles;
-}
-
-
 function botCantaEnvidoTipo() {
   if (manoBot.length < 3) return;
 
@@ -743,10 +578,9 @@ function botCantaEnvidoTipo() {
 
   log("Bot canta Envido");
 
-  mostrarAvisoCanto("¡ENVIDO!");
-
   mostrarBotonesEnvido();
 }
+
 
 function mostrarBotonesEnvido() {
   document.getElementById("btnQuiero").style.display = "inline-block";
@@ -807,11 +641,6 @@ function responderEnvido(quiere) {
   return;
 }
 
-posiblesCartasJugador = posiblesManosConEnvido(eJ, manoBot, cartasJugadas);
-
-console.log("Cartas posibles del jugador:");
-posiblesCartasJugador.forEach(c => console.log(`${c.numero} de ${c.palo}`));
-
   if (eJ > eB) {
     puntosJugador += envidoAcumulado;
     log(`Ganaste el Envido (+${envidoAcumulado})`);
@@ -861,17 +690,12 @@ function continuarDespuesDeEnvido() {
   }
 }
 
+
 function actualizarPuntos(){
   document.getElementById("puntosJugador").textContent = puntosJugador;
   document.getElementById("puntosBot").textContent = puntosBot;
-
-  if (puntosJugador >= 15) {
-    setTimeout(() => mostrarPopupFinal("jugador"), 50);
-  }
-  if (puntosBot >= 15) {
-    setTimeout(() => mostrarPopupFinal("bot"), 50);
-  }
 }
+
 
 function log(txt){
   const d = document.getElementById("log");
@@ -880,25 +704,20 @@ function log(txt){
   d.scrollTop = d.scrollHeight;
 }
 
-
 function mostrarCartasEnMesa(origen, carta) {
   const mesaCenter = document.getElementById("mesa-center");
   if (!mesaCenter || !carta) return;
 
-  // Crear un div para la carta
   const nuevaCarta = document.createElement("div");
   nuevaCarta.classList.add("carta-mesa");
 
-  // Crear la imagen de la carta
   const img = document.createElement("img");
-  img.src = `../TIMI/${carta.numero}_${carta.palo}.png`;  // Ruta de la imagen
-  img.alt = `${carta.numero} de ${carta.palo}`;  // Texto alternativo para accesibilidad
-  img.className = "carta-imagen";  // Clase para la imagen
+  img.src = `../TIMI/${carta.numero}_${carta.palo}.png`;
+  img.alt = `${carta.numero} de ${carta.palo}`;
+  img.className = "carta-imagen";
 
-  // Agregar la imagen a la carta
   nuevaCarta.appendChild(img);
 
-  // Si la carta es del bot, ajusta el estilo para el bot
   if (origen === "bot") {
     nuevaCarta.classList.add("carta-bot");
     const offset = offsetBot * 10;
@@ -907,7 +726,6 @@ function mostrarCartasEnMesa(origen, carta) {
     mesaCenter.appendChild(nuevaCarta);
     offsetBot++;
   } else {
-    // Si la carta es del jugador, ajusta el estilo para el jugador
     nuevaCarta.classList.add("carta-jugador");
     const offset = offsetPlayer * 10;
     nuevaCarta.style.setProperty("--offset", `${offset}px`);
@@ -925,30 +743,207 @@ function limpiarMesa(){
   offsetBot = 0;
 }
 
-function mostrarOverlayGanaste() {
+
+function verificarFinDelJuego() {
   if (puntosJugador >= 15) {
-  document.getElementById("overlay-title").textContent = "¡Ganaste!";
-  document.getElementById("overlay-text").textContent = "Llegaste a 15 puntos.";
-  document.getElementById("overlay-text").textContent = puntosJugador + " a " + puntosBot;
-  document.getElementById("overlay").style.display = "flex";
+    mostrarOverlayGanaste();
+  } else if (puntosBot >= 15) {
+    mostrarOverlayPerdiste();
   }
 }
 
-function mostrarOverlayPerdiste() {
-  if (puntosBot >= 15) {
-  document.getElementById("overlay-title").textContent = "Perdiste";
-  document.getElementById("overlay-text").textContent = "El bot llegó a 15 puntos.";
-  document.getElementById("overlay-text").textContent = puntosJugador + " a " + puntosBot;
-  document.getElementById("overlay").style.display = "flex";
+function generarTarotsAleatorios() {
+  const tarotsSeleccionados = [];
+  const numeros = new Set();
+
+  while (numeros.size < 5) {
+    numeros.add(Math.floor(Math.random() * 9) + 1);
   }
+  
+  return Array.from(numeros);
+}
+
+function generarCartasEspecialesFijas() {
+  if (cartasEspecialesFijas !== null) return cartasEspecialesFijas; 
+
+  const todas = [];
+  for (const palo of palos) {
+    for (const numero of numeros) {
+      todas.push({ numero, palo });
+    }
+  }
+
+  // Mezclar
+  for (let i = todas.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [todas[i], todas[j]] = [todas[j], todas[i]];
+  }
+
+  // Elegir 8
+  cartasEspecialesFijas = todas.slice(0, 8);
+  return cartasEspecialesFijas;
+}
+
+function mostrarCartasTarot() {
+  const container = document.getElementById("cartas-tarot");
+  container.innerHTML = ""; // Limpiar contenedor
+  
+  const tarotsNumeros = generarTarotsAleatorios();
+  
+  tarotsNumeros.forEach(numero => {
+    const img = document.createElement("img");
+    img.src = `../TIMI/tarot_${numero}.png`;
+    img.alt = `Tarot ${numero}`;
+    img.className = "carta-tarot";
+    img.onclick = () => {
+      const max = Math.max(...tarotsNumeros);
+      if (numero === max) {
+        mostrarMenuCartasEspeciales();
+      } else {
+        mostrarMenuCartasNormales();
+      }
+    };
+    container.appendChild(img);
+  });
+}
+
+function mostrarMenuCartasNormales() {
+  const menuCartas = document.getElementById("menu-cartas-normales");
+  if (!menuCartas) {
+    const container = document.body;
+    const menu = document.createElement("div");
+    menu.id = "menu-cartas-normales";
+    menu.style.cssText = `
+    position: fixed; top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    background: black;
+    padding: 20px; border-radius: 30px;
+    z-index: 1000; max-height: 80vh; overflow-y: auto;
+  `;
+    const titulo = document.createElement("h2");
+    titulo.textContent = "Todas las Cartas";
+    titulo.style.color = "white";
+    menu.appendChild(titulo);
+    
+    const gridCartas = document.createElement("div");
+    gridCartas.style.cssText = "display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px;";
+    
+    for (const palo of palos) {
+      for (const numero of numeros) {
+        const cartaDiv = document.createElement("div");
+        cartaDiv.style.cssText = "cursor: pointer; border-radius: 5px;";
+        
+        const img = document.createElement("img");
+        img.src = `../TIMI/${numero}_${palo}.png`;
+        img.alt = `${numero} de ${palo}`;
+        img.style.cssText = "width: 100%; height: auto; border-radius: 5px;";
+        
+        cartaDiv.appendChild(img);
+        cartaDiv.onclick = () => {
+          menu.remove();
+          cerrarOverlay();
+        };
+        gridCartas.appendChild(cartaDiv);
+      }
+    }
+    
+    menu.appendChild(gridCartas);
+    
+    const cerrarBtn = document.createElement("button");
+    cerrarBtn.textContent = "Cerrar";
+    cerrarBtn.style.cssText = "margin-top: 20px; padding: 10px 20px; background-color: black; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;";
+    cerrarBtn.onclick = () => menu.remove();
+    menu.appendChild(cerrarBtn);
+    
+    container.appendChild(menu);
+  }
+}
+
+function mostrarMenuCartasEspeciales() {
+  const menuExistente = document.getElementById("menu-cartas-especiales");
+  if (menuExistente) return; // NO rehacer si ya está hecho
+
+  const container = document.body;
+  
+  const menu = document.createElement("div");
+  menu.id = "menu-cartas-especiales";
+  menu.style.cssText = `
+    position: fixed; top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    background: black;
+    padding: 20px; border-radius: 30px;
+    z-index: 1000; max-height: 80vh; overflow-y: auto;
+  `;
+  const titulo = document.createElement("h2");
+  titulo.textContent = "Cartas Especiales";
+  titulo.style.color = "white";
+  menu.appendChild(titulo);
+
+  const grid = document.createElement("div");
+  grid.style.cssText = `
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+  `;
+
+  const cartas = generarCartasEspecialesFijas();
+
+  cartas.forEach(c => {
+    const div = document.createElement("div");
+    div.style.cssText = "cursor: pointer; border-radius: 5px;";
+
+    const img = document.createElement("img");
+    img.src = `../TIMI/${c.numero}_${c.palo}.png`;
+    img.style.cssText = "width: 100%; height: auto; border-radius: 5px;";
+    
+    div.appendChild(img);
+
+    div.onclick = () => {
+      menu.remove();
+      cerrarOverlay();
+    };
+
+    grid.appendChild(div);
+  });
+
+  menu.appendChild(grid);
+
+  const cerrarBtn = document.createElement("button");
+  cerrarBtn.textContent = "Cerrar";
+  cerrarBtn.style.cssText = `
+    margin-top: 20px;
+    padding: 10px 20px;
+    color: white;
+    background-color: black;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+  `;
+  cerrarBtn.onclick = () => menu.remove();
+
+  menu.appendChild(cerrarBtn);
+  container.appendChild(menu);
+}
+
+function mostrarOverlayGanaste() {
+  mostrarCartasTarot();
+  document.getElementById("ganaste").style.display = "block";
+}
+
+function mostrarOverlayPerdiste() {
+  document.getElementById("perdiste").style.display = "block";
 }
 
 function cerrarOverlay() {
   document.getElementById("overlay").style.display = "none";
+  document.getElementById("perdiste").style.display = "none";
+  document.getElementById("ganaste").style.display = "none";
+  puntosJugador = 0;
+  puntosBot = 0;
+  actualizarPuntos();
+  repartir();
 }
-
-mostrarOverlayGanaste()
-mostrarOverlayPerdiste()
 
 
 function mostrarAvisoCanto(texto) {
@@ -961,19 +956,43 @@ function mostrarAvisoCanto(texto) {
   }, 2000);
 }
 
-function mostrarAvisoResultado(texto, gano) {
-  const div = document.getElementById("avisoResultado");
 
-  div.textContent = texto;
-
-  // cambia color según si ganó o perdió
-  div.className = "aviso-resultado " + (gano ? "ganado" : "perdido");
-
-  div.style.display = "block";
-
-  setTimeout(() => {
-    div.style.display = "none";
-  }, 2000);
+function GigantismoTrue(puntos, tipoEnvido) {
+  if (!Gigantismo) return puntos;
+  return puntos + 1;
 }
+
+
+function DruploTrue(ganoElJugador) {
+  if (!Druplo) return;
+
+  if (ganoElJugador) 
+    puntosJugador += 1;
+}
+
+
+function jockerDefensaTrue(puntosOriginales, tipoCanto) {
+  if (!jockerDefensa) return puntosOriginales;
+
+  if (tipoCanto === "envido" || tipoCanto === "truco") {
+    return puntosOriginales;
+  }
+
+  const puntosReducidos = puntosOriginales - 1;
+
+  return Math.max(0, puntosReducidos);
+}
+ 
+
+function jockerRiesgosoTrue(puntosJugadorEnvido, jugadorGano, puntosNormales) {
+  if (!jockerRiesgoso) return puntosNormales;
+
+  if (jugadorGano && puntosJugadorEnvido <= 25) {
+    return puntosNormales + 2;
+  }
+
+  return puntosNormales;
+}
+
 
 document.addEventListener("DOMContentLoaded", repartir);

@@ -1,119 +1,115 @@
-<!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>DRUPLO</title>
-        <link rel="stylesheet" type="text/css" href="inicio.css">
-    </head>
-    <body>
-        <h1>
-            <img src="../TIMI/Titulo.png" width="50%">
-        </h1>
-        <ul>
-            <li class="Coleccion">
-                <a href="#" id="openCol"><img src="../TIMI/Coleccion.png" class="boton"></a>
-            </li>
-            <li class="Jugar">
-                <a href="juego.html"><img src="../TIMI/Jugar.png" class="boton-jugar"></a>
-            </li>
-            <li class="opciones">
-                <div class="boton-opciones">
-                    <a href="#" id="openOptions"><img src="../TIMI/Opciones.png" class="boton" class="boton-opciones"></a>
+    <!DOCTYPE html>
+    <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>DRUPLO</title>
+            <link rel="stylesheet" type="text/css" href="inicio.css">
+        </head>
+        <body>
+            <h1>
+                <img src="../TIMI/Titulo.png" width="50%">
+            </h1>
+            <ul>
+                <li class="Coleccion">
+                    <a href="#" id="openCol"><img src="../TIMI/Coleccion.png" class="boton"></a>
+                </li>
+                <li class="Jugar">
+                    <a href="juego.html"><img src="../TIMI/Jugar.png" class="boton-jugar"></a>
+                </li>
+                <li class="opciones">
+                    <div class="boton-opciones">
+                        <a href="#" id="openOptions"><img src="../TIMI/Opciones.png" class="boton" class="boton-opciones"></a>
+                    </div>
+                </li>
+            </ul>
+            <a class="Cuenta" href="iniciosecion.html"><img src="../TIMI/Cuenta.png" class="boton"></a>
+            <div id="overlay">
+                <div id="modalConfiguracion">
+                    <h3>Opciones</h3>
+                    <div class="slidecontainer">
+                        <p class="volumenGeneral">Volumen General</p>
+                        <input type="range" min="0" max="100" value="100" class="volumen" id="volumenGeneral">
+                    </div>
+                    <div class="slidecontainer">
+                        <p class="VolumenMusica">Volumen Musica</p>
+                        <input type="range" min="0" max="100" value="100" class="volumen" id="volumenMusica">
+                    </div>
+                    <div class="slidecontainer">
+                        <p class="VolumenEfects">Volumen Efectos de Sonido</p>
+                        <input type="range" min="0" max="100" value="100" class="volumen" id="myRange">
                 </div>
-            </li>
-        </ul>
-        <a class="Cuenta" href="iniciosecion.html"><img src="../TIMI/Cuenta.png" class="boton"></a>
-        <div id="overlay">
-            <div id="modalConfiguracion">
-                <h3>Opciones</h3>
-                <div class="slidecontainer">
-                    <p>Volumen General</p>
-                    <input type="range" min="0" max="100" value="100" class="volumen" id="volumenGeneral">
-                </div>
-                <div class="slidecontainer">
-                    <p>Volumen Musica</p>
-                    <input type="range" min="0" max="100" value="100" class="volumen" id="volumenMusica">
-                </div>
-                <div class="slidecontainer">
-                    <p>Volumen Efectos de Sonido</p>
-                    <input type="range" min="0" max="100" value="100" class="volumen" id="myRange">
-                </div>
-                <p>Velocidad</p>
-                <div class="slidecontainer">
-                    <input type="range" min="0.5" max="2" value="60" class="slider" id="myRange" step="0.5">
-                  </div>
                 <button class="clolseModal" id="closeOptionsModal">X</button>
+                </div>
             </div>
-        </div>
-        <div id="overlay2">
-            <div id="modalColeccion">
-                <h2>COLECCION</h2>
-                <div class="cards" id="cards">
-                    <div class="carta bloqueada"><img src="TIMI/image 62.png"></div>
-                    <div class="carta bloqueada"><img src="TIMI/image 64.png"></div>
-                    <div class="carta bloqueada"><img src="TIMI/image 66.png"></div>
-                    <div class="carta bloqueada"><img src="TIMI/image 68.png"></div>
-                    <div class="carta bloqueada"><img src="TIMI/image 69.png"></div>
-                    <div class="carta bloqueada"><img src="TIMI/image 70.png"></div>
-                    <div class="carta bloqueada"><img src="TIMI/image 71.png"></div>
-                    <div class="carta bloqueada"><img src="TIMI/image 72.png"></div>
-                    <div class="carta bloqueada"><img src="TIMI/image 75.png"></div>
-                    <div class="carta bloqueada"><img src="TIMI/image 78.png"></div>
-                    <div class="carta bloqueada"><img src="TIMI/image 79.png"></div>
-                    <div class="carta bloqueada"><img src="TIMI/image 80.png"></div>
-                    <div class="carta bloqueada"><img src="TIMI/image 82.png"></div>
-                  </div>
-                <button class="closeModal" id="closeColModal">X</button>
+            <div id="overlay2">
+                <div id="modalColeccion">
+                    <h2>COLECCION</h2>
+                    <div class="cards" id="cards">
+                        <div class="carta bloqueada"><img src="TIMI/image 62.png"></div>
+                        <div class="carta bloqueada"><img src="TIMI/image 64.png"></div>
+                        <div class="carta bloqueada"><img src="TIMI/image 66.png"></div>
+                        <div class="carta bloqueada"><img src="TIMI/image 68.png"></div>
+                        <div class="carta bloqueada"><img src="TIMI/image 69.png"></div>
+                        <div class="carta bloqueada"><img src="TIMI/image 70.png"></div>
+                        <div class="carta bloqueada"><img src="TIMI/image 71.png"></div>
+                        <div class="carta bloqueada"><img src="TIMI/image 72.png"></div>
+                        <div class="carta bloqueada"><img src="TIMI/image 75.png"></div>
+                        <div class="carta bloqueada"><img src="TIMI/image 78.png"></div>
+                        <div class="carta bloqueada"><img src="TIMI/image 79.png"></div>
+                        <div class="carta bloqueada"><img src="TIMI/image 80.png"></div>
+                        <div class="carta bloqueada"><img src="TIMI/image 82.png"></div>
+                    </div>
+                    <button class="closeModal" id="closeColModal">X</button>
+                </div>
             </div>
-        </div>
-        <script>
-            document.getElementById('openOptions').addEventListener('click', function(event) {
-                event.preventDefault(); // Prevents navigating away
-                document.getElementById('overlay').style.display = 'block';
-            });
-
-            document.getElementById('openCol').addEventListener('click', function(event) {
-                event.preventDefault(); // Prevents navigating away
-                document.getElementById('overlay2').style.display = 'block';
-            });
-
-            document.getElementById('closeOptionsModal').addEventListener('click', function() {
-                document.getElementById('overlay').style.display = 'none';
-            });
-
-            document.getElementById('closeColModal').addEventListener('click', function() {
-                document.getElementById('overlay2').style.display = 'none';
-            });
-        </script>
-        <audio id="bgMusic" loop>
-            <source src="audio/musica.mp3" type="audio/mp3">
-        </audio>
-        <script>
-            const audio = document.getElementById('bgMusic');
-            const sliderGeneral = document.getElementById('volumenGeneral');
-            const sliderMusica = document.getElementById('volumenMusica');
-        
-            audio.currentTime = 18.25;
-        
-            function actualizarVolumen() {
-                const volGeneral = sliderGeneral.value / 100;
-                const volMusica = sliderMusica.value / 100;
-                audio.volume = volGeneral * volMusica;
-            }
-        
-            sliderGeneral.addEventListener('input', actualizarVolumen);
-            sliderMusica.addEventListener('input', actualizarVolumen);
-        
-            document.body.addEventListener('click', () => {
-                audio.play().then(() => {
-                    console.log("Música reproducida");
-                }).catch(error => {
-                    console.error("Error al reproducir audio:", error);
+            <script>
+                document.getElementById('openCol').addEventListener('click', function(event) {
+                    event.preventDefault(); 
+                    document.getElementById('overlay2').style.display = 'block';
                 });
-                actualizarVolumen();
-            }, { once: true });
-        </script>
-        <script src="inicio.js"></script>
-    </body>
-</html>
+                document.getElementById('openOptions').addEventListener('click', function(event) {
+                    event.preventDefault(); 
+                    document.getElementById('overlay').style.display = 'block';
+                });
+                document.getElementById('closeOptionsModal').addEventListener('click', function() {
+                    document.getElementById('overlay').style.display = 'none';
+                });
+
+                document.getElementById('closeColModal').addEventListener('click', function() {
+                    document.getElementById('overlay2').style.display = 'none';
+                });
+            </script>
+            <audio id="bgMusic" loop>
+                <source src="audio/musica.mp3" type="audio/mp3">
+            </audio>
+            <script>
+                const audio = document.getElementById('bgMusic');
+                const sliderGeneral = document.getElementById('volumenGeneral');
+                const sliderMusica = document.getElementById('volumenMusica');
+            
+                audio.currentTime = 18.25;
+            
+                function actualizarVolumen() {
+                    const volGeneral = sliderGeneral.value / 100;
+                    const volMusica = sliderMusica.value / 100;
+                    audio.volume = volGeneral * volMusica;
+                }
+            
+                sliderGeneral.addEventListener('input', actualizarVolumen);
+                sliderMusica.addEventListener('input', actualizarVolumen);
+            
+                document.body.addEventListener('click', () => {
+                    audio.play().then(() => {
+                        console.log("Música reproducida");
+                    }).catch(error => {
+                        console.error("Error al reproducir audio:", error);
+                    });
+                    actualizarVolumen();
+                }, { once: true });
+            </script>
+            <script src="inicio.js"></script>
+        </body>
+    </html>
+
+    .

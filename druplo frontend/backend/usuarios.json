@@ -1,0 +1,12 @@
+[
+    {
+        "usuario":"444",
+        "contraseña":"444",
+        "mazo": [
+       "1espada", "2espada", "3espada", "4espada", "5espada", "6espada", "7espada", "10espada", "11espada", "12espada",
+       "1basto", "2basto", "3basto", "4basto", "5basto", "6basto", "7basto", "10basto", "11basto", "12basto",
+       "1oro", "2oro", "3oro", "4oro", "5oro", "6oro", "7oro", "10oro", "11oro", "12oro",
+       "1copa", "2copa", "3copa", "4copa", "5copa", "6copa", "7copa", "10copa", "11copa", "12copa"
+        ]
+    }
+]
