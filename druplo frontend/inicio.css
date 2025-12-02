@@ -46,9 +46,17 @@ h1 {
 }
 
 h2 {
-    color: #0000ff;
+    color: #ffff;
     font-size:  5vw;
     margin: 0;
+    height: 100px;
+    width: 500px;
+    background-color: #cb2c2c;
+    position: relative;
+    left: 450px;
+    font-style: cmbx10;
+    border-radius: 20px;  
+    
 }
 
 h3 {
@@ -105,7 +113,7 @@ h3 {
 #modalColeccion{
     position: center;
     width: 100%;
-    background-color: #ffff00;
+    background-color: #BBBBBB;
     padding: 2em;
     color: #0000ff;
     z-index: 1001;   
@@ -164,11 +172,13 @@ accent-color:#FF4545;
 }
 
 .clolseModal{
-    width: 75px;
+    width: 300px;
     height: 75px;
-    background-color: red;
-    border-radius: 50px;
+    background-color: #ff4545;
     position: center;
+    font-weight: 700;
+font-style: cmbx10;
+font-size: 30px;
     
 }
 .closeModal{
