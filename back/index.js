@@ -128,8 +128,9 @@ function elLoco(data) {
             if (index !== -1) {
                 const numero = data.carta.match(/^\d+/)[0];
                 const nuevoPalo = palos[Math.floor(Math.random() * palos.length)];
-                const cartaNueva = numero + nuevoPalo;
                 usuarios[i].mazo[index] = cartaNueva;
+                const nuevoNumero = numeros[Math.floor(Math.random() * numeros.length)];
+                const cartaNueva = nuevoNumero + nuevoPalo; 
             }
 
             break;
@@ -140,6 +141,33 @@ function elLoco(data) {
     return usuarios;
 }
 subscribePOSTEvent("elLoco", elLoco);
+
+function tarot (data){
+    let usuarios = JSON.parse(fs.readFileSync("usuarios.json", "utf-8"));
+    for (let i = 0; i < usuarios.length; i++) {
+        if (usuarios[i].usuario === data.usuario) {
+            usuarios[i].tarot.push(data.tarot)
+        }
+    }
+    fs.writeFileSync("usuarios.json", JSON.stringify(usuarios, null, 2));
+
+    return usuarios;
+}
+subscribePOSTEvent("tarot", tarot);
+
+function partidasGanadas(data){
+    let usuarios = JSON.parse(fs.readFileSync("usuarios.json", "utf-8"));
+    for (let i = 0; i < usuarios.length; i++) {
+        if (usuarios[i].usuario = data.usuario) {
+            if (data.partidaGanada){
+                usuarios[i].partidasGanadas = usuarios[i].partidasGanadas++
+            }
+        }
+    }
+    fs.writeFileSync("usuarios.json", JSON.stringify(usuarios, null, 2));
+
+}
+subscribePOSTEvent("partidasGanadas", partidasGanadas);
 
 
 startServer();

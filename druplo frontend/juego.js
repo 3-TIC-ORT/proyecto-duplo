@@ -75,9 +75,6 @@ function calcularEnvido(mano) {
 
 
 function crearMazos() {
-  mazoJugador = [];
-  mazoBot = [];
-
   for (const p of palos) {
     for (const n of numeros) {
 
@@ -477,14 +474,6 @@ function cantarValecuatro() {
 
 function decidirRespuestaTruco(puntosSiQuiere, puntosSiNoQuiere) {
   const fuerzaBot = manoBot.reduce((acc, c) => acc + c.fuerza, 0);
-
-  if (trucoNivel >= 0 && envidoEnCurso === false) {
-    envidoCantado = true;
-    tipoEnvidoActual = "envido"; 
-    log("Bot quiso cantar Envido, pero se resuelve Truco primero");
-
-    return;
-}
   if (fuerzaBot >= 25) quiere = true;
   else if (fuerzaBot >= 20) quiere = Math.random() < 0.7;
   else quiere = Math.random() < 0.15;
@@ -499,12 +488,6 @@ function decidirRespuestaTruco(puntosSiQuiere, puntosSiNoQuiere) {
       rondaTerminada = true;
       setTimeout(repartir, 1000);
     }
-if (envidoCantado && !envidoEnCurso) {
-    envidoEnCurso = true;
-    log("Bot canta Envido");
-    botCantaEnvidoTipo();
-    return;
-}
 if (!turnoJugador) botPlay();
 setTimeout(() => {}, 500);
 }
