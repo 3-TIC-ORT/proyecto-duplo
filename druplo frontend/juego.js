@@ -1,4 +1,3 @@
-let cartasEspecialesFijas = null;
 const palos = ["espada","basto","oro","copa"];
 const numeros = [1,2,3,4,5,6,7,10,11,12];
 const fuerza = {
@@ -42,6 +41,8 @@ let bazasJugador = 0;
 let bazasBot = 0;
 let playedPlayer = null;
 let playedBot = null;
+
+let cartasEspecialesFijas = null;
 
 // JOKERS
 let Gigantismo = false;
