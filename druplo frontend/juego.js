@@ -5,14 +5,14 @@ const fuerza = {
   "3":10,"2":9,"1":8,"12":7,"11":6,"10":5,"7":4,"6":3,"5":2,"4":1
 };
 
-let mazo = [];
 let mazoJugador = [];
-let mazoCompleto = [];
+let mazoBot = [];
 let manoJugador = [];
 let manoBot = [];
 let cartasJugadas = [];
 let puntosJugador = 0;
 let puntosBot = 0;
+let quiere = false;
 
 let offsetPlayer = 0;
 let offsetBot = 0;
@@ -73,23 +73,55 @@ function calcularEnvido(mano) {
   return maxEnvido;
 }
 
-function crearMazo(){
-  for(const p of palos) for(const n of numeros) {
-    mazo.push({numero:n,palo:p,fuerza:fuerza[`${n}${p}`] || fuerza[n] || 0});
+
+function crearMazos() {
+  mazoJugador = [];
+  mazoBot = [];
+
+  for (const p of palos) {
+    for (const n of numeros) {
+
+      mazoJugador.push({
+        numero: n,
+        palo: p,
+        fuerza: fuerza[`${n}${p}`] || fuerza[n] || 0
+      });
+
+      mazoBot.push({
+        numero: n,
+        palo: p,
+        fuerza: fuerza[`${n}${p}`] || fuerza[n] || 0
+      });
+
+    }
   }
 }
 
 
-function sacarCarta(){
-  const i = Math.floor(Math.random()*mazo.length);
-  return mazo.splice(i,1)[0];
+
+function sacarCartaJugador() {
+  const i = Math.floor(Math.random() * mazoJugador.length);
+  return mazoJugador.splice(i, 1)[0];
+}
+
+function sacarCartaBot() {
+  const i = Math.floor(Math.random() * mazoBot.length);
+  return mazoBot.splice(i, 1)[0];
 }
 
 
 function repartir(){
-  crearMazo();
-  manoJugador = [sacarCarta(), sacarCarta(), sacarCarta()];
-  manoBot = [sacarCarta(), sacarCarta(), sacarCarta()];
+  crearMazos();
+  manoJugador = [
+    sacarCartaJugador(),
+    sacarCartaJugador(),
+    sacarCartaJugador()
+  ];
+  manoBot = [
+    sacarCartaBot(),
+    sacarCartaBot(),
+    sacarCartaBot()
+  ];
   empiezaJugador = !empiezaJugador;
   turnoJugador = empiezaJugador;
   trucoNivel = -1;
@@ -99,20 +131,20 @@ function repartir(){
   playedBot = null;
   bazasJugador = 0;
   bazasBot = 0;
-
   safeDisable("btnTruco", false);
-  safeDisable("btnRetruco",false);
-  safeDisable("btnValecuatro",false);
+  safeDisable("btnRetruco", false);
+  safeDisable("btnValecuatro", false);
   safeDisable("btnEnvido", false);
   safeDisable("btnRealEnvido", false);
   safeDisable("btnFaltaEnvido", false);
   safeDisable("btnMazo", false);
-
   renderCartas();
   limpiarMesa();
+
   log(`Nueva mano. ${empiezaJugador ? "Vos sos mano" : "Bot es mano"}.`);
-  if(!empiezaJugador) setTimeout(botPlayFirst, 700);
+  if (!empiezaJugador) setTimeout(botPlayFirst, 700);
 }
+
 
 
 function safeDisable(id, v){
@@ -446,13 +478,18 @@ function cantarValecuatro() {
 function decidirRespuestaTruco(puntosSiQuiere, puntosSiNoQuiere) {
   const fuerzaBot = manoBot.reduce((acc, c) => acc + c.fuerza, 0);
 
-  let quiere = false;
+  if (trucoNivel >= 0 && envidoEnCurso === false) {
+    envidoCantado = true;
+    tipoEnvidoActual = "envido"; 
+    log("Bot quiso cantar Envido, pero se resuelve Truco primero");
 
+    return;
+}
   if (fuerzaBot >= 25) quiere = true;
   else if (fuerzaBot >= 20) quiere = Math.random() < 0.7;
   else quiere = Math.random() < 0.15;
 
-  setTimeout(() => {
+  
     if (quiere) {
       log(`Bot quiere ${trucoNivel === 1 ? "Truco" : trucoNivel === 2 ? "Retruco" : "Vale Cuatro"}`);
     } else {
@@ -462,7 +499,14 @@ function decidirRespuestaTruco(puntosSiQuiere, puntosSiNoQuiere) {
       rondaTerminada = true;
       setTimeout(repartir, 1000);
     }
-  }, 500);
+if (envidoCantado && !envidoEnCurso) {
+    envidoEnCurso = true;
+    log("Bot canta Envido");
+    botCantaEnvidoTipo();
+    return;
+}
+if (!turnoJugador) botPlay();
+setTimeout(() => {}, 500);
 }
 
 
@@ -960,7 +1004,10 @@ function mostrarAvisoCanto(texto) {
 
 function GigantismoTrue(puntos, tipoEnvido) {
   if (!Gigantismo) return puntos;
-  return puntos + 1;
+  if (tipoEnvido === "envido" || tipoEnvido === "real envido" || tipoEnvido === "falta envido" && jugadorGano) {
+
+  }
+ 
 }
 
 
@@ -975,24 +1022,24 @@ function DruploTrue(ganoElJugador) {
 function jockerDefensaTrue(puntosOriginales, tipoCanto) {
   if (!jockerDefensa) return puntosOriginales;
 
-  if (tipoCanto === "envido" || tipoCanto === "truco") {
-    return puntosOriginales;
+if (envidoAcumulado >2 && tipoCanto === "envido" && quienCantoEnvido === "bot" && !quiero) {
+    return puntosBot - 1;
   }
 
-  const puntosReducidos = puntosOriginales - 1;
-
-  return Math.max(0, puntosReducidos);
+ else if (tipoCanto === "truco" && quienCantoTruco === "bot" && !quiero) {
+    return puntosBot - 1;
+  }
 }
- 
+//1000 LINEAS WACHOO
 
-function jockerRiesgosoTrue(puntosJugadorEnvido, jugadorGano, puntosNormales) {
-  if (!jockerRiesgoso) return puntosNormales;
+function jockerRiesgosoTrue(puntosJugadorEnvido, jugadorGano) {
+  if (!jockerRiesgoso) return puntosJugadorEnvido;
 
   if (jugadorGano && puntosJugadorEnvido <= 25) {
-    return puntosNormales + 2;
+    return puntosJugadorEnvido + 2;
   }
 
-  return puntosNormales;
+  return puntosJugadorEnvido;
 }
 
 

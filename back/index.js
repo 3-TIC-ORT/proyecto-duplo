@@ -34,8 +34,7 @@ return usuario;
 
 subscribePOSTEvent("Registro", Registro);
 
-function mazoJugador (data){
-    
+function mazoJugador (data){ 
 }
 
 function getUsuarios() {
@@ -43,6 +42,7 @@ function getUsuarios() {
     return usuarios;
 }
 subscribeGETEvent("getUsuarios", getUsuarios);
+
 
 function elDiablo (data){
     let usuarios = JSON.parse(fs.readFileSync("usuarios.json", "utf-8"))
@@ -111,6 +111,35 @@ function elEmperador(data) {
     return usuarios;
 }
 subscribePOSTEvent("elEmperador", elEmperador);
+
+
+function elLoco(data) {
+    let usuarios = JSON.parse(fs.readFileSync("usuarios.json", "utf-8"));
+
+    const palos = ["espada", "basto", "oro", "copa"];
+    const numeros = [1,2,3,4,5,6,7,10,11,12];
+
+    for (let i = 0; i < usuarios.length; i++) {
+
+        if (usuarios[i].usuario === data.usuario) {
+
+            let index = usuarios[i].mazo.indexOf(data.carta);
+
+            if (index !== -1) {
+                const numero = data.carta.match(/^\d+/)[0];
+                const nuevoPalo = palos[Math.floor(Math.random() * palos.length)];
+                const cartaNueva = numero + nuevoPalo;
+                usuarios[i].mazo[index] = cartaNueva;
+            }
+
+            break;
+        }
+    }
+    fs.writeFileSync("usuarios.json", JSON.stringify(usuarios, null, 2));
+
+    return usuarios;
+}
+subscribePOSTEvent("elLoco", elLoco);
 
 
 startServer();
