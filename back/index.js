@@ -142,6 +142,7 @@ function elLoco(data) {
 }
 subscribePOSTEvent("elLoco", elLoco);
 
+
 function tarot (data){
     let usuarios = JSON.parse(fs.readFileSync("usuarios.json", "utf-8"));
     for (let i = 0; i < usuarios.length; i++) {
@@ -154,6 +155,7 @@ function tarot (data){
     return usuarios;
 }
 subscribePOSTEvent("tarot", tarot);
+
 
 function partidasGanadas(data){
     let usuarios = JSON.parse(fs.readFileSync("usuarios.json", "utf-8"));

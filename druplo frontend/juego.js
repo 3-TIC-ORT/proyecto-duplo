@@ -988,9 +988,8 @@ function mostrarAvisoCanto(texto) {
 function GigantismoTrue(puntos, tipoEnvido) {
   if (!Gigantismo) return puntos;
   if (tipoEnvido === "envido" || tipoEnvido === "real envido" || tipoEnvido === "falta envido" && jugadorGano) {
-
+return puntos += 1
   }
- 
 }
 
 
@@ -1013,7 +1012,7 @@ if (envidoAcumulado >2 && tipoCanto === "envido" && quienCantoEnvido === "bot" &
     return puntosBot - 1;
   }
 }
-//1000 LINEAS WACHOO
+
 
 function jockerRiesgosoTrue(puntosJugadorEnvido, jugadorGano) {
   if (!jockerRiesgoso) return puntosJugadorEnvido;
